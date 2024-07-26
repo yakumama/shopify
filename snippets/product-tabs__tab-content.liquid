@@ -1,0 +1,112 @@
+{%- comment -%}
+    Render product tab content base on section block.
+
+    Accepts:
+    - block: {Object}
+{%- endcomment -%}
+
+{%- case block.type -%}
+    {%- when '@app' -%}
+        {%- render block -%}
+    {%- when 'description' -%}
+        {%- if product.description != blank and product.description != '' -%}
+            <div class="rte product-descrition">{{ product.description }}</div>
+        {%- endif -%}
+
+    {%- when 'details' -%}
+        {%- if product.metafields.my_fields.details.value != blank -%}
+            {%- render 'metafields-product-details', details_position: block.settings.details_position -%}
+        {%- endif -%}
+    {%- when 'faq' -%}
+        {%- render 'metafields-product-faq' -%}
+
+    {%- when 'custom_liquid' -%}
+        {{- block.settings.custom_liquid -}}
+
+    {%- when 'reviews' -%}
+        {%- case block.settings.app -%}
+            {%- when 'judgeme' -%}
+                <div
+                    class="shopify-block shopify-app-block"
+                    data-block-handle="review_widget"
+                >
+                    {% if block.settings.enable_theme_appearance -%}
+                        {{ 'component-tabs--judgeme.css' | asset_url | stylesheet_tag }}
+                    {%- endif %}
+                    <div
+                        id="judgeme_product_reviews"
+                        class="
+                            jdgm-widget jdgm-review-widget {% if block.settings.enable_theme_appearance -%}
+                                shopify-relax transition-bezier
+                            {%- endif %}
+                        "
+                        data-product-title="{{ product.title | escape }}"
+                        data-id="{{ product.id }}"
+                        {% if request.design_mode %}
+                            data-design-mode="true"
+                        {% endif %}
+                    >
+                        {{ product.metafields.judgeme.widget }}
+                    </div>
+                </div>
+            {%- when 'spr' -%}
+                <style data-critical="true">
+                    #shopify-section-{{ section.id }} .spr-container {
+                        padding: 0; border: none;
+                    }
+                    #shopify-section-{{ section.id }} .spr-header-title {
+                        display: none;
+                    }
+                </style>
+                {% if block.settings.enable_theme_appearance -%}
+                    {{ 'component-tabs--spr.css' | asset_url | stylesheet_tag }}
+                {%- endif %}
+                <div
+                    id="shopify-product-reviews"
+                    {% if block.settings.enable_theme_appearance -%}
+                        class="shopify-relax"
+                    {%- endif %}
+                    data-id="{{ product.id }}"
+                    style="margin: .5rem 0; overflow: visible"
+                >
+                    {{ product.metafields.spr.reviews }}
+                </div>
+        {%- endcase -%}
+    {%- when 'similar' -%}
+        {%- liquid
+            assign items = block.settings.source
+            assign hideTitle = true
+
+            if items.count == 0 and block.settings.is_random
+                capture handels
+                    render 'helper__get-similar-products', product: product, limit: block.settings.products_per_page
+                endcapture
+                assign items = handels | split: '|'
+            endif
+        -%}
+        {%- if items.count > 0 or items.size > 0 -%}
+            {%- unless hideTitle -%}
+                <h2>{{ 'products.similar_products' | t }}</h2>
+            {%- endunless -%}
+            {%- liquid
+                assign has_side_column = false
+                if section.settings.tabs_layout == 'expanded'
+                    assign has_side_column = true
+                endif
+            -%}
+            {%- render 'grid-items',
+                ul_id: 'similar-products-tabbed',
+                ul_class: 'products',
+                has_side_column: has_side_column,
+                items: items,
+                limit: block.settings.products_per_page,
+                mode: 'grid',
+                columns: block.settings.products_per_page,
+                badge_size: block.settings.badge_size,
+                image_ratio: block.settings.image_ratio,
+                product_secondary_image: settings.product_card_secondary_image,
+                product_to_cart_button: block.settings.show_to_cart_button,
+                product_show_vendor: settings.product_card_vendor
+            -%}
+        {%- endif -%}
+{%- endcase -%}

@@ -1,0 +1,80 @@
+{%- comment -%}
+    Render search results for article.
+
+    Accepts:
+     - block {Object}
+{%- endcomment -%}
+
+{%- liquid
+    assign limit = block.settings.limit_per_page
+
+    if block.settings.tags_limit > 0
+        assign tags_position = 'on_image'
+    else
+        assign tags_position = ''
+    endif
+
+    assign loader_target = 'articles-' | append: section.id
+-%}
+
+{{ 'component-article-tags.css' | asset_url | stylesheet_tag }}
+{{ 'section-main-blog.css' | asset_url | stylesheet_tag }}
+{{ 'component-article-card.css' | asset_url | stylesheet_tag }}
+
+<div class="blog-articles__wrapper">
+    {%- paginate search.results by limit -%}
+        <ul
+            id="articles-{{ section.id }}"
+            class="blog-articles"
+            data-message-no-results="{{ 'templates.search.no_results' | t: terms: search.terms | escape }}"
+        >
+            {%- for article in search.results -%}
+                {%- liquid
+                    unless article.object_type == 'article'
+                        continue
+                    endunless
+                    assign article_info_class = ''
+                    assign article_tags_position = tags_position
+                -%}
+
+                <li
+                    class="blog-articles__article article{% unless lead_article == nil %} article--newest{% endunless %}"
+                    data-article-tag="{{ article.tags | join:',' }}"
+                    {% unless lead_article == null %}
+                        {{- lead_article.shopify_attributes -}}
+                    {% endunless %}
+                >
+                    {%- render 'article-card',
+                        article: article,
+                        excerpt_limit: block.settings.excerpt_limit,
+                        info_class: article_info_class,
+                        show_author: block.settings.show_author,
+                        show_comments: block.settings.show_comments,
+                        show_date: block.settings.show_date,
+                        show_image: block.settings.show_image,
+                        show_link: block.settings.show_link,
+                        tags_position: article_tags_position,
+                        tags_limit: block.settings.tags_limit
+                    -%}
+                </li>
+            {%- endfor -%}
+        </ul>
+
+        <div class="footer-container">
+            {% capture pagination_html -%}
+        {% render 'pagination'
+          paginate: paginate
+          tag_name: 'fetcher-component'
+        %}
+      {%- endcapture -%}
+
+            {{
+                pagination_html
+                | replace_first: '<fetcher-component',
+                    '<fetcher-component id="blog-pagination-#section#" data-loader-target="#loader_target#" data-section="#section#"'
+                | replace_first: '#loader_target#', loader_target
+                | replace: '#section#', section.id
+            }}
+        </div>
+    {%- endpaginate -%}
+</div>

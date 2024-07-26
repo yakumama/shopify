@@ -1,0 +1,212 @@
+{%- liquid
+    assign sectionId = section.id | prepend: '#shopify-section-'
+    if section.blocks.size > 1
+        assign enable_slider = true
+    else
+        assign enable_slider = false
+    endif
+-%}
+
+{% render 'icons-bar__styles',
+    enable_slider: enable_slider,
+    icon_size: section.settings.icons_width,
+    show_border_bottom: section.settings.border_bottom,
+    show_border_top: section.settings.border_top,
+    show_separator: section.settings.separator,
+    show_shadow: section.settings.shadow,
+    visibility: section.settings.visibility
+%}
+<style>
+    {{ sectionId }} .icons-bar {
+        position: relative;
+        z-index: 2;
+    }
+</style>
+{% capture inner_html %}
+<ul class="dynamic-page-width icons-bar-inner{% if enable_slider %} slider slider--mobile{% endif %}">
+    {% for block in section.blocks %}
+        <li class="icons-bar-item{% if enable_slider %} slider__slide{% endif %}" {{ block.shopify_attributes }}>
+            {% unless block.settings.icon == blank %}
+                <div class="icons-bar-icon">
+                    {% if block.settings.icon contains 'relax' %}
+                        {% render 'theme-icons'
+                            name: block.settings.icon
+                        %}
+                    {% else %}
+                        {% render 'icons-bar__icon'
+                            name: block.settings.icon
+                            css_class: 'ionicon'
+                        %}
+                    {% endif %}
+                </div>
+            {% endunless %}
+            <div class="icons-bar-text">{{ block.settings.text }}</div>
+        </li>
+        {% if forloop.last == false and section.settings.separator == true %}
+            <li class="icons-bar-item-separator"> </li>
+        {% endif %}
+    {% endfor %}
+</ul>
+{% endcapture %}
+
+{% render 'icons-bar__wrapper',
+    color_scheme: section.settings.color_scheme,
+    enable_slider: enable_slider,
+    inner_html: inner_html
+%}
+
+{% schema %}
+{
+    "name": "t:sections.icons_bar.name",
+    "class": "spaced-section spaced-section--full-width",
+    "tag": "section",
+    "settings": [
+        {
+            "type": "select",
+            "id": "color_scheme",
+            "options": [
+                {
+                    "value": "accent-1",
+                    "label": "t:sections.all.colors.accent_1.label"
+                },
+                {
+                    "value": "accent-2",
+                    "label": "t:sections.all.colors.accent_2.label"
+                },
+                {
+                    "value": "background-1",
+                    "label": "t:sections.all.colors.background_1.label"
+                },
+                {
+                    "value": "background-2",
+                    "label": "t:sections.all.colors.background_2.label"
+                },
+                {
+                    "value": "inverse",
+                    "label": "t:sections.all.colors.inverse.label"
+                }
+            ],
+            "default": "background-1",
+            "label": "t:sections.all.colors.label"
+        },
+        {
+            "type": "select",
+            "id": "visibility",
+            "options": [
+                {
+                    "value": "all",
+                    "label": "t:sections.icons_bar.settings.visibility.options.all.label"
+                },
+                {
+                    "value": "desktop",
+                    "label": "t:sections.icons_bar.settings.visibility.options.desktop.label"
+                },
+                {
+                    "value": "mobile",
+                    "label": "t:sections.icons_bar.settings.visibility.options.mobile.label"
+                }
+            ],
+            "default": "all",
+            "label": "t:sections.icons_bar.settings.visibility.label",
+            "info": "t:sections.icons_bar.settings.visibility.info"
+        },
+        {
+            "type": "range",
+            "id": "icons_width",
+            "label": "t:sections.icons_bar.settings.icons_width.label",
+            "min": 24,
+            "max": 64,
+            "step": 2,
+            "default": 48,
+            "unit": "px"
+        },
+        {
+            "type": "checkbox",
+            "id": "border_top",
+            "label": "t:sections.all.settings.border_top.label",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "border_bottom",
+            "label": "t:sections.all.settings.border_bottom.label",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "shadow",
+            "label": "t:sections.icons_bar.settings.shadow.label",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "separator",
+            "label": "t:sections.icons_bar.settings.separator.label",
+            "default": false
+        }
+    ],
+    "max_blocks": 4,
+    "blocks": [
+        {
+            "type": "icon",
+            "name": "t:sections.icons_bar.blocks.icon.name",
+            "settings": [
+                {
+                    "type": "select",
+                    "id": "icon",
+                    "options": [
+                        { "value": "", "label": "None"},
+                        { "value": "academic-cap", "label": "Academic cap"},
+                        { "value": "adjustments", "label": "Adjustments"},
+                        { "value": "bell", "label": "Bell"},
+                        { "value": "cake", "label": "Cake"},
+                        // { "value": "calendar", "label": "Calendar"},
+                        { "value": "relax-returns", "label": "Calendar"},
+                        { "value": "cash", "label": "Cash"},
+                        { "value": "chart-pie", "label": "Chart pie"},
+                        { "value": "chat-alt-2", "label": "Chat"},
+                        { "value": "clipboard-check", "label": "Checked"},
+                        { "value": "clock", "label": "Clock"},
+                        { "value": "lock-closed", "label": "Lock"},
+                        { "value": "menu", "label": "Menu"},
+                        { "value": "pencil", "label": "Pencil"},
+                        { "value": "scale", "label": "Scale"},
+                        { "value": "share", "label": "Share"},
+                        { "value": "shield-check", "label": "Shield"},
+                        { "value": "sparkles", "label": "Sparkles"},
+                        { "value": "thumb-up", "label": "Thumb up"},
+                        { "value": "trash", "label": "Trash"},
+                        // { "value": "truck", "label": "Truck"},
+                        { "value": "relax-shipping", "label": "Truck"},
+                        { "value": "relax-environment", "label": "Environment"}
+                    ],
+                    "default": "relax-shipping",
+                    "label": "t:sections.icons_bar.blocks.icon.settings.icon.label"
+                },
+                {
+                    "type": "richtext",
+                    "id": "text",
+                    "label": "t:sections.icons_bar.blocks.icon.settings.text.label",
+                    "default": "<p>Title</p><p>Description</p>"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "t:sections.icons_bar.presets.name",
+            "blocks": [
+                {
+                    "type": "icon"
+                },
+                {
+                    "type": "icon"
+                },
+                {
+                    "type": "icon"
+                }
+            ]
+        }
+    ]
+}
+{% endschema %}

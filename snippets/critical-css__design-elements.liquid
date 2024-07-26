@@ -1,0 +1,16 @@
+{% comment %}
+    Define CSS variabled for design elements.
+{% endcomment %}
+
+{% style %}
+    body {
+        --design-elemet__lightning-uri: url("{{ 'dots-lightning.svg' | asset_url }}");
+        --design-elemet__lightning-color: {{ settings.color_svg_lightning_dots }};
+
+        --design-elemet__rectangle-uri: url("{{ 'dots-rectangle.svg' | asset_url }}");
+        --design-elemet__rectangle-color: {{ settings.color_svg_rectangle_dots }};
+
+        --design-elemet__triangle-uri: url("{{ 'dots-triangle.svg' | asset_url }}");
+        --design-elemet__triangle-color: {{ settings.color_svg_triangle_dots }};
+    }
+{% endstyle %}

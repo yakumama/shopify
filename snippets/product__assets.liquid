@@ -1,0 +1,26 @@
+{%- comment -%}
+    Product section assets.
+{%- endcomment -%}
+
+{{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-text-expandable.css' | asset_url | stylesheet_tag }}
+
+{% if request.locale.iso_code contains 'ar' -%}
+    {{ 'section-main-product-rtl.css' | asset_url | stylesheet_tag }}
+{% endif %}
+
+{% liquid
+    assign quantity_selector = section.blocks | where: 'type', 'quantity_selector'
+    if quantity_selector.size > 0
+        echo 'component-quantity-input.css' | asset_url | stylesheet_tag
+    endif
+%}
+{% liquid
+    assign collapsible_tabs = section.blocks | where: 'type', 'collapsible_tab'
+    if collapsible_tabs.size > 0
+        echo 'component-accordion.css' | asset_url | stylesheet_tag
+    endif
+%}
+
+<link rel="stylesheet" href="{{ 'component-deferred-media.css' | asset_url }}" media="print" onload="this.media='all'">

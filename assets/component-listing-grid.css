@@ -1,0 +1,27 @@
+.classic ul {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.sorting summary::after {
+    background-color: currentColor;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: .5rem;
+    right: .5rem;
+    height: 2px;
+}
+
+.sorting [data-advanced=true].open ~ .icon-caret {
+    transform: rotate(180deg);
+}
+
+/* STYLES FOR SCREENS 768PX AND OVER */
+
+@media (min-width: 768px) {
+    .collection-grid-section {
+        /* prevent horisontal scroll on small screens when hover over item */
+        overflow-x: clip;
+    }
+}

@@ -1,0 +1,81 @@
+@media (min-width: 990px), print {
+    .full-width .container--grid,
+    .full-width .container--grid .list-menu--disclosure,
+    .full-width .container--grid .col-items {
+        display: flex;
+        width: 100%;
+    }
+
+    .dropdown-inner.full-width .list-menu--disclosure > li summary {
+        --color-foreground: var(--header--dropdown-color);
+    }
+
+    .dropdown-inner.full-width .list-menu--disclosure > li summary,
+    .dropdown-inner.full-width .list-menu--disclosure > li > a {
+        display: block;
+        overflow-wrap: break-word;
+        padding-left: 0px;
+        font-weight: 600;
+    }
+
+    .full-width .container--grid .col-3 {
+        width: 100%;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .full-width .container--grid .col-3 > .media > a {
+        transition: transform .5s ease;
+    }
+
+    .full-width .container--grid .col-3 > .media:hover > a {
+        transform: scale(1.03);
+    }
+
+    .full-width .container--grid .image--link {
+        color: var(--color-foreground);
+        margin-top: 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        font-weight: 600}
+
+    .full-width .container--grid .media:hover ~ .image--link {
+        color: var(--color-foreground-75);
+    }
+
+    .dropdown-inner.full-width .list-menu--disclosure .icon-caret {
+        display: none;
+    }
+
+    .dropdown-inner.full-width {
+        left: 0px;
+        right: 0px;
+        border-top-right-radius: 0px;
+        border-top-left-radius: 0px;
+    }
+
+    .dropdown-inner.full-width .childlist-menu--disclosure > li {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .header__submenu summary .collection__item-image {
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .dropdown-inner__product-list,
+    .dropdown-inner__collections {
+      width: 100%;
+      padding:0 1rem;
+    }
+
+    .dropdown-inner__collections ul,
+    .dropdown-inner__product-list ul {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+}

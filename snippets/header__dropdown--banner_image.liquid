@@ -1,0 +1,31 @@
+{% comment %}
+    Render header dropdown content - Banner Image
+
+    Accepts:
+      - block:              {Object}
+      - blockOrder:         {Numb}
+      - parent_item_index:  {Numb}
+{% endcomment %}
+
+{% liquid
+    assign image = block.settings.item_image
+    assign imageLink = block.settings.image_link
+    assign imageTitle = block.settings.image_title
+    assign selectedParentIndex = block.settings.item_menu_index
+%}
+
+{%- if image != blank and parent_item_index == selectedParentIndex -%}
+    <div class="col-3 item--with-image" data-block-index="{{ blockOrder }}">
+        <div
+            class="media"
+            style="padding-bottom: {% if image != blank %}{{ 1 | divided_by: image.aspect_ratio | times: 100 }}{% else %}100{% endif %}%"
+        >
+            {%- unless imageLink == blank -%}<a href="{{ imageLink }}" class="link_to">{%- endunless -%}
+            {% render 'render-image', image: image, widths: image.width %}
+            {%- unless imageLink == blank -%}</a>{%- endunless -%}
+        </div>
+        {%- unless imageTitle == blank -%}
+            <div class="image--link text-center">{{ imageTitle | escape }}</div>
+        {%- endunless -%}
+    </div>
+{%- endif -%}

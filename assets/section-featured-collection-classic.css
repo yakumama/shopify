@@ -1,0 +1,35 @@
+.classic .products {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    overflow: visible;
+}
+
+@media (min-width: 768px) {
+
+    .classic slider-component ul > li {
+        display: inline-block;
+    }
+}
+
+.classic .rows-divider {
+    display: none;
+}
+
+.classic .title-wrapper .view-all {
+    white-space: nowrap;
+}
+
+.classic .title-wrapper .heading {
+    margin: 1rem 0;
+}
+
+@media all and (min-width: 768px) {
+    .classic .title-wrapper .heading {
+        align-items: center;
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        margin: 0;
+    }
+}

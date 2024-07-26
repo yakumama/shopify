@@ -1,0 +1,43 @@
+{%- comment -%}
+    Render collapsible (accordion) tab based on block settings
+
+    Accepts:
+     - block:      {Object}
+     - blockOrder: {Number}
+     - sectionId:  {String}
+     - product:    {Object}
+{%- endcomment -%}
+
+<div
+    class="product__info-block product__info-block--collapsible_tab product__accordion accordion"
+    style="order: {{ blockOrder }}"
+    {{ block.shopify_attributes }}
+>
+    <details>
+        <summary>
+            <div class="summary__title">
+                {% liquid
+                    unless block.settings.icon == 'none'
+                        assign css_class = 'icon-accordion color-foreground-' | append: settings.accent_icons
+                        render 'icon-accordion', name: block.settings.icon, css_class: css_class
+                    endunless
+                %}
+                <h2 class="accordion__title">{{ block.settings.heading | default: block.settings.page.title }}</h2>
+            </div>
+            <svg
+                aria-hidden="true"
+                focusable="false"
+                role="presentation"
+                class="icon icon-caret"
+                width="12"
+                height="12"
+            >
+                <use href="#icon-caret" />
+            </svg>
+        </summary>
+        <div class="accordion__content rte">
+            {{ block.settings.content }}
+            {{ block.settings.page.content }}
+        </div>
+    </details>
+</div>

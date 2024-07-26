@@ -1,0 +1,43 @@
+.scrolling-text {
+    position: relative;
+    z-index: 29;
+}
+
+    .scrolling-text .content__wrapper {
+        pointer-events: none;
+    }
+
+    .scrolling-text .content__wrapper p {
+        display: inline-block;
+        animation: scrolling linear infinite;
+    }
+
+    .scrolling-text .content__wrapper span._separator {
+        display: contents;
+    }
+
+.scrolling-text:hover .content__wrapper p {
+    animation-play-state: paused;
+}
+
+@keyframes scrolling {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(-100% + 100vw));
+    }
+}
+
+@keyframes scrolling-revers {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(100% - 100vw));
+    }
+}
+
+[dir="rtl"] .scrolling-text .content__wrapper p {
+            animation-name: scrolling-revers;
+        }

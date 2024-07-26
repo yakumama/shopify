@@ -1,0 +1,83 @@
+{%- comment -%}
+    Render multicolumn column (block).
+
+    Accepts:
+     -  block {Object}
+{%- endcomment -%}
+
+{% liquid
+    case section.blocks.size
+        when 1
+            assign image_sizes = 'calc(min(1200px, 100vw) - .75rem * 2)'
+        when 2
+            assign image_sizes = '(max-width: 767px) calc(100vw - .75rem * 2), calc(min(1200px, 100vw) / 2 - .75rem * 2)'
+        else
+            assign image_sizes = '(max-width: 767px) calc(100vw - .75rem * 2), (max-width: 989px) calc(100vw / 2 - .75rem * 2), calc(min(1200px, 100vw) / 3 - .75rem * 2)'
+    endcase
+%}
+
+{% capture inner_html %}
+    {% if block.settings.media_enabled %}
+        <div class="multicolumn-card__image-wrapper">
+          <div class="media media--transparent">
+          {%- if block.settings.image != blank -%}
+            {% render 'render-image',
+                image: block.settings.image
+                widths: '698,966,1176,#iw#'
+                sizes: image_sizes
+            %}
+          {%- else -%}
+            {%- if block.settings.icon != blank -%}
+              {%- if block.settings.icon contains 'relax' -%}
+                  {%- render 'theme-icons'
+                      name: block.settings.icon
+                  -%}
+              {%- else -%}
+                  {%- render 'icons-bar__icon'
+                      name: block.settings.icon
+                      css_class: 'ionicon'
+                  -%}
+              {%- endif -%}
+            {%- else -%}
+              {{ 'collection-5' | placeholder_svg_tag: 'placeholder' }}
+            {%- endif -%}
+          {%- endif -%}
+          </div>
+        </div>
+    {% endif %}
+
+    <div class="multicolumn-card__content multicolumn-card__content-{{ section.settings.column_alignment }}"
+      style="color: {{ block.settings.color_text }}"
+    >
+      <h3 class="title" style="color: {{ block.settings.color_title }}">
+        {{- block.settings.title | escape -}}
+      </h3>
+      <p class="sub_title h6" style="{% if block.settings.bg_color_subtitle != blank %}background:{{ block.settings.bg_color_subtitle }}{% endif %}">
+        {{- block.settings.sub_title | escape -}}
+      </p>
+      <div class="rte text">
+        {{- block.settings.text -}}
+      </div>
+    </div>
+
+{% endcapture %}
+
+<li
+    id="col-{{ block.id }}--{{ section.id }}"
+    class="multicolumn-list__item grid__item{% if section.settings.swipe_on_mobile %} slider__slide{% endif %}{% if section.settings.content_animation %} with-reveal-animation{% endif %}"
+    {{ block.shopify_attributes }}
+>
+    {% if block.settings.link -%}
+        <a
+            class="multicolumn-card{% if block.settings.media_spaced %} multicolumn-card--spaced{% endif %}"
+            href="{{ block.settings.link }}"
+            title="{{ block.settings.link.title }}"
+        >
+            {{ inner_html }}
+        </a>
+    {%- else -%}
+        <div class="multicolumn-card{% if block.settings.media_spaced %} multicolumn-card--spaced{% endif %}">
+            {{ inner_html }}
+        </div>
+    {%- endif %}
+</li>

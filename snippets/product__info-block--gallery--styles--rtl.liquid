@@ -1,0 +1,16 @@
+{% comment %}
+    Render critical styles for product gallery (RTL)
+{% endcomment %}
+
+{% style %}
+    @media (min-width: 768px) {
+        #gallery-{{ section.id }} {
+            padding: 0 calc(var(--thumb--width) + var(--thumb--gap)) 0 0;
+        }
+
+        #gallery-{{ section.id }} .slider-thumbs--wrapper {
+            left: auto;
+            right: 0;
+        }
+    }
+{% endstyle %}

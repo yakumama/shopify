@@ -1,0 +1,481 @@
+{%- liquid
+    if section.settings.page == null
+        assign data = section.settings.fallback_data
+        assign data = data | default: '[{"name": "First C.", "photo": "michael.png", "location": "City, Country", "date": "Jan, 2024", "rating": "5", "testimonial": "Give real customer feedback about store experience, and share thoughts about the product, or service."},{"name": "Second C.", "photo": "adeline.png", "location": "City, Country", "date": "Dec, 2023", "rating": "5", "testimonial": "Give real customer feedback about store experience, and share thoughts about the product, or service."}, {"name": "Third C.", "photo": "samantha.png", "location": "City, Country", "date": "Nov, 2023", "rating": "4", "testimonial": "Give real customer feedback about store experience, and share thoughts about the product, or service."}]'
+        assign data = data | strip
+        assign first_char = data | slice: 0, 1
+        assign last_char = data | slice: -1, 1
+        if first_char == '[' and last_char == ']'
+            assign number_of_chars_to_return = data | size | minus: 2
+            assign data = data | slice: 1, number_of_chars_to_return | strip
+            assign data = data | replace: '} , {', '},{'
+            assign data = data | replace: '}, {', '},{'
+            assign data = data | replace: '} ,{', '},{'
+            assign first_char = data | slice: 0, 1
+            assign last_char = data | slice: -1, 1
+            if first_char == '{' and last_char == '}'
+                assign number_of_chars_to_return = data | size | minus: 2
+                assign data = data | slice: 1, number_of_chars_to_return | strip
+                assign data = data | split: '},{'
+            endif
+        endif
+    else
+        assign data = section.settings.page.metafields.custom.testimonials.value
+    endif
+
+    assign testimonial_per_page = section.settings.per_page
+    if section.settings.show_all
+        assign testimonial_per_page = null
+    endif
+
+    assign heading = section.blocks | where: 'type', 'heading' | first
+-%}
+
+{{ 'section-testimonials.css' | asset_url | stylesheet_tag }}
+
+{% render 'testimonials__symbols' %}
+
+<div class="dynamic-page-width color-{{ section.settings.color_scheme}}">
+    {% unless heading == null %}
+        <div class="testimonials-heading heading _before">
+            <{{ heading.settings.level }} class="title" {{ heading.shopify_attributes }}>
+                <span>{{ heading.settings.heading | escape }}</span>
+                {% if heading.settings.decorate %}
+                    {% render 'theme-icons', name: 'quotes', css_class: '_quotes hidden' %}
+                {% endif %}
+            </{{ heading.settings.level }}>
+        </div>
+    {% endunless %}
+
+    <slider-component class="testimonials-wrapper">
+        <ul class="testimonials testimonials-grid{% unless section.settings.appearance == 'grid' %} slider slider--tablet slider--mobile{% endunless %}{% if section.settings.appearance == 'slider' %} slider--desktop{% endif %}">
+            {% for item in data limit: testimonial_per_page %}
+                {% liquid
+                    if item.testimonial == null
+                        assign photo = blank
+                        assign name = blank
+                        assign location = blank
+                        assign date = blank
+                        assign rating = 0
+                        assign testimonial = blank
+
+                        assign raw_item = item
+
+                        assign first_char = raw_item | slice: 0, 1
+                        assign last_char = raw_item | slice: -1, 1
+                        if first_char == '"' and last_char == '"'
+                            assign number_of_chars_to_return = raw_item | size | minus: 2
+                            assign raw_item = raw_item | slice: 1, number_of_chars_to_return | strip
+                        endif
+
+                        assign raw_item = raw_item | replace: '": "', '":"'
+                        assign raw_item = raw_item | replace: '" : "', '":"'
+                        assign raw_item = raw_item | replace: '" :"', '":"'
+
+                        assign raw_item = raw_item | replace: '", "', '","'
+                        assign raw_item = raw_item | replace: '" , "', '","'
+                        assign raw_item = raw_item | replace: '" ,"', '","'
+
+                        assign raw_item = raw_item | split: '","'
+
+                        for field in raw_item
+                            if field contains 'photo":"'
+                                assign photo = field | replace_first: 'photo":"', ''
+                            endif
+                            if field contains 'name":"'
+                                assign name = field | replace_first: 'name":"', ''
+                            endif
+                            if field contains 'location":"'
+                                assign location = field | replace_first: 'location":"', ''
+                            endif
+                            if field contains 'date":"'
+                                assign date = field | replace_first: 'date":"', ''
+                            endif
+                            if field contains 'rating":"'
+                                assign rating = field | replace_first: 'rating":"', '' | plus: 0
+                            endif
+                            if field contains 'testimonial":"'
+                                assign testimonial = field | replace_first: 'testimonial":"', ''
+                            endif
+                        endfor
+                    else
+                        assign photo = item.photo | default: blank
+                        assign name = item.name | default: blank
+                        assign location = item.location | default: blank
+                        assign date = item.date | default: blank
+                        assign rating = item.rating | default: 0 | plus: 0
+                        assign testimonial = item.testimonial | default: blank
+                    endif
+                %}
+                <li class="testimonial{% unless section.settings.appearence == 'grid' %} slider__slide{% endunless %}">
+                    <div class="testimonial-inner">
+                        {% if section.settings.show_photo %}
+                            <div class="photo media">
+                                {%- if photo != blank %}
+                                    {% assign img_url = photo | file_img_url: 'master' %}
+                                    {% if img_url contains '?v=' %}
+                                        <img
+                                            src="{{ img_url }}"
+                                            alt="{{ 'sections.testimonials.no_testimonials.photo_alt' | t: name: name }}"
+                                            loading="lazy"
+                                        >
+                                    {% else %}
+                                        {% assign photo = blank %}
+                                    {% endif %}
+                                {% endif %}
+                                {% if photo == blank %}
+                                    <svg class="placeholder" aria-hidden="true" focusable="false">
+                                        <use href="#person-{{ section.id }}"></use>
+                                    </svg>
+                                {% endif -%}
+                            </div>
+                        {% endif %}
+                        <p class="author">{{ name }}</p>
+                        <p class="location">{{ location }}</p>
+                        {% if section.settings.show_date %}
+                            <p class="date">{{ date }}</p>
+                        {% endif %}
+                        <div class="text rte">
+                            {% if section.settings.show_rating %}
+                                <div class="rating">
+                                    {% for i in (1..5) %}
+                                        <svg
+                                            {% if rating > forloop.index0 %}
+                                                class="active"
+                                            {% endif %}
+                                            aria-hidden="true"
+                                            focusable="false"
+                                            width="14"
+                                            height="13"
+                                        >
+                                            <use href="#star-{{ section.id }}"></use>
+                                        </svg>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {{ testimonial }}
+                        </div>
+                    </div>
+                </li>
+            {% else %}
+                <li class="no-testimonials-info">
+                    <div class="testimonial-inner">
+                        <div class="photo media">
+                            {%- capture placeholder_html -%}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 56C145.72 56 56 145.72 56 256s89.72 200 200 200 200-89.72 200-200S366.28 56 256 56zm0 82a26 26 0 11-26 26 26 26 0 0126-26zm48 226h-88a16 16 0 010-32h28v-88h-16a16 16 0 010-32h32a16 16 0 0116 16v104h28a16 16 0 010 32z"/></svg>
+                        {%- endcapture -%}
+                            {{ placeholder_html | replace_first: '<svg', '<svg class="placeholder"' }}
+                        </div>
+                        <p class="author">{{ 'sections.testimonials.no_testimonials.heading' | t }}</p>
+                        <div class="text rte">{{ 'sections.testimonials.no_testimonials.message' | t }}</div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% unless section.settings.appearance == 'grid' %}
+            {% render 'slider__buttons', count: data.size %}
+        {% endunless %}
+    </slider-component>
+
+    {% for block in section.blocks %}
+        {% case block.type %}
+            {% when 'button' %}
+                {% render 'testimonials__block-button', block: block %}
+            {% when 'form' %}
+                {% render 'testimonials__block-form', block: block %}
+        {% endcase %}
+    {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.testimonials.name",
+  "tag": "section",
+  "class": "spaced-section section-testimonials",
+  "settings": [
+    {
+      "type": "page",
+      "id": "page",
+      "label": "t:sections.testimonials.settings.page.label",
+      "info": "t:sections.testimonials.settings.page.info"
+    },
+    {
+      "type": "text",
+      "id": "fallback_data",
+      "label": "t:sections.testimonials.settings.fallback_data.label",
+      "info": "t:sections.testimonials.settings.fallback_data.info"
+    },
+    {
+      "type": "range",
+      "id": "per_page",
+      "min": 3,
+      "max": 15,
+      "step": 1,
+      "label": "t:sections.testimonials.settings.per_page.label",
+      "default": 9
+    },
+    {
+      "type": "checkbox",
+      "id": "show_all",
+      "label": "t:sections.testimonials.settings.show_all.label",
+      "info": "t:sections.testimonials.settings.show_all.info"
+    },
+    {
+      "type": "select",
+      "id": "appearance",
+      "options": [
+        {
+          "value": "slider",
+          "label": "t:sections.featured-collection.settings.products_appearance.options.slider"
+        },
+        {
+          "value": "grid",
+          "label": "t:sections.featured-collection.settings.products_appearance.options.grid"
+        },
+        {
+          "value": "mixed",
+          "label": "t:sections.featured-collection.settings.products_appearance.options.mixed"
+        }
+      ],
+      "default": "mixed",
+      "label": "t:sections.testimonials.settings.appearance.label",
+      "info": "t:sections.testimonials.settings.appearance.info"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        {
+          "value": "background-1",
+          "label": "t:sections.testimonials.settings.color_scheme.options.background_1.label"
+        },
+        {
+          "value": "background-1-darker",
+          "label": "t:sections.testimonials.settings.color_scheme.options.background_1_darker.label"
+        }
+      ],
+      "default": "background-1",
+      "label": "t:sections.all.colors.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.testimonials.settings.header.card"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_photo",
+      "label": "t:sections.testimonials.settings.show_photo.label",
+      "info": "t:sections.testimonials.settings.show_photo.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "t:sections.testimonials.settings.show_date.label",
+      "info": "t:sections.testimonials.settings.show_date.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "t:sections.testimonials.settings.show_rating.label",
+      "info": "t:sections.testimonials.settings.show_rating.info"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "t:sections.image-banner.blocks.heading.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Testimonials",
+          "label": "t:sections.image-banner.blocks.heading.settings.heading.label"
+        },
+        {
+          "type": "select",
+          "id": "level",
+          "label": "t:sections.image-banner.blocks.heading.settings.level.label",
+          "options": [
+            {
+              "value": "h1",
+              "label": "t:sections.image-banner.blocks.heading.settings.level.options.h1.label"
+            },
+            {
+              "value": "h2",
+              "label": "t:sections.image-banner.blocks.heading.settings.level.options.h2.label"
+            },
+            {
+              "value": "h3",
+              "label": "t:sections.image-banner.blocks.heading.settings.level.options.h3.label"
+            }
+          ],
+          "default": "h2"
+        },
+        {
+          "type": "checkbox",
+          "id": "decorate",
+          "label": "t:sections.testimonials.blocks.heading.settings.decorate.label",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "t:sections.rich-text.blocks.button.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "default": "Button label",
+          "label": "t:sections.testimonials.blocks.button.settings.label.label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.testimonials.blocks.button.settings.link.label"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "t:sections.testimonials.blocks.button.settings.style.label",
+          "options": [
+            {
+              "value": "primary",
+              "label": "t:sections.testimonials.blocks.button.settings.style.options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "t:sections.testimonials.blocks.button.settings.style.options.secondary"
+            },
+            {
+              "value": "tertiary",
+              "label": "t:sections.testimonials.blocks.button.settings.style.options.tertiary"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "form",
+      "name": "t:sections.testimonials.blocks.form.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:sections.testimonials.blocks.form.settings.heading.label",
+          "default": "New testimonial"
+        },
+        {
+          "type": "select",
+          "id": "field_location",
+          "label": "t:sections.testimonials.blocks.form.settings.field_location.label",
+          "options": [
+            {
+              "value": "hidden",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.hidden"
+            },
+            {
+              "value": "optional",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.optional"
+            },
+            {
+              "value": "required",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.required"
+            }
+          ],
+          "default": "hidden"
+        },
+        {
+          "type": "select",
+          "id": "field_photo",
+          "label": "t:sections.testimonials.blocks.form.settings.field_photo.label",
+          "options": [
+            {
+              "value": "hidden",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.hidden"
+            },
+            {
+              "value": "optional",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.optional"
+            },
+            {
+              "value": "required",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.required"
+            }
+          ],
+          "default": "hidden"
+        },
+        {
+          "type": "select",
+          "id": "field_email",
+          "label": "t:sections.testimonials.blocks.form.settings.field_email.label",
+          "options": [
+            {
+              "value": "hidden",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.hidden"
+            },
+            {
+              "value": "optional",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.optional"
+            },
+            {
+              "value": "required",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.required"
+            }
+          ],
+          "default": "required"
+        },
+        {
+          "type": "select",
+          "id": "field_order",
+          "label": "t:sections.testimonials.blocks.form.settings.field_order.label",
+          "info": "t:sections.testimonials.blocks.form.settings.field_order.info",
+          "options": [
+            {
+              "value": "hidden",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.hidden"
+            },
+            {
+              "value": "optional",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.optional"
+            },
+            {
+              "value": "required",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.required"
+            }
+          ],
+          "default": "hidden"
+        },
+        {
+          "type": "select",
+          "id": "field_rating",
+          "label": "t:sections.testimonials.blocks.form.settings.field_rating.label",
+          "options": [
+            {
+              "value": "hidden",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.hidden"
+            },
+            {
+              "value": "optional",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.optional"
+            },
+            {
+              "value": "required",
+              "label": "t:sections.testimonials.blocks.form.settings._status.options.required"
+            }
+          ],
+          "default": "required"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.testimonials.name"
+    }
+  ]
+}
+{% endschema %}

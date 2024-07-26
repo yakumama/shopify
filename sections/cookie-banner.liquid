@@ -1,0 +1,81 @@
+<style>
+    .cookie-consent-banner {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: var(--color-background);
+      padding: 1rem 2rem;
+      box-shadow: 0 0 1rem var(--color-foreground-50);
+      z-index: 999;
+    }
+    .cookie-bar-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .cookie-bar-container .btn-link {
+      width: 100%;
+      max-width: 8rem;
+      text-align: center;
+    }
+    .cookie-bar-container button {
+      padding: .5rem 1.75rem;
+    }
+
+    .cookie-consent-banner .actions {
+      display: flex;
+      gap: 1rem;
+    }
+    @media (max-width: 767px), print {
+      .cookie-consent-banner {
+          padding: 1rem;
+      }
+      .cookie-bar-container {
+        flex-direction: column;
+        gap: .5rem;
+      }
+    }
+</style>
+
+{% liquid
+    # cookie lifetime, days | default 90
+    assign lifetime = settings.cookie_banner_lifetime | plus: 0
+%}
+
+<div id="cookie-consent-banner" class="cookie-consent-banner" data-lifetime="{{ lifetime }}">
+    <div class="cookie-bar-container">
+        <div class="cookie-bar-text">
+            <span class="text">{{ settings.cookie_banner_title }}</span>
+        </div>
+        {%- if settings.cookie_banner_link_to_privacy_page_enabled -%}
+            <div class="btn-link">
+                <span class="link"
+                    ><a href="{{ settings.privacy_page_url | default: '' }}">
+                        {{- 'general.cookie_banner.learn_more' | t -}}
+                    </a></span
+                >
+            </div>
+        {% endif %}
+        <div class="actions">
+            <button
+                type="button"
+                class="button button--tertiary button--small"
+                data-action="decline"
+                aria-label="{{ 'general.cookie_banner.decline' | t }}"
+            >
+                {{ 'general.cookie_banner.decline' | t }}
+            </button>
+            <button
+                type="button"
+                class="button button--primary button--small"
+                data-action="accept"
+                aria-label="{{ 'general.cookie_banner.accept' | t }}"
+            >
+                {{ 'general.cookie_banner.accept' | t }}
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,166 @@
+{% liquid
+    assign bgColor = section.settings.cover_background_gradient | default: section.settings.cover_background_color
+    assign textColor = section.settings.text_color
+    assign textColorGradient = section.settings.text_color_gradient
+
+    # space separator by default
+    assign iconSeparator = '&nbsp;'
+    for block in section.blocks
+        case block.settings.icon_separator
+            when 'dot'
+                assign iconSeparator = '&bull;'
+            when 'dash'
+                assign iconSeparator = '&#8211;'
+            when 'sim'
+                assign iconSeparator = '&sim;'
+        endcase
+    endfor
+%}
+
+{% style %}
+    #shopify-section-{{ section.id }} .content__wrapper {
+        background: {{ bgColor }};
+        padding: calc({{ section.settings.text_font_size }} * .05rem);
+        white-space: nowrap;
+        overflow: hidden;
+        {% if section.settings.use_box_shadow -%}
+        box-shadow: 1px 3px 36px -7px var(--color-foreground-20);
+        {%- endif %}
+    }
+
+    #shopify-section-{{ section.id }} .content__wrapper > p {
+        font-size: {{ section.settings.text_font_size }}px;
+        font-family: {{ section.settings.text_font_family.family }}, {{ section.settings.text_font_family.fallback_families }};
+        {% if textColorGradient != empty -%}
+        background:{{ textColorGradient  }};
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;{% else %}
+        color: {{ textColor }};
+        {%- endif %}
+        animation-duration:{{ section.settings.text_animation_duration | times: 5 }}s;
+    }
+{% endstyle %}
+{%- for block in section.blocks -%}
+    <div class="content__wrapper">
+        <p>
+            {%- for i in (1..20) %}
+                <span class="_text">
+                    {{ block.settings.scrolling_text }}
+                </span>
+                <span class="_separator {{ block.settings.icon_separator }}">
+                    {{ iconSeparator }}
+                </span>
+            {% endfor -%}
+        </p>
+    </div>
+{%- endfor -%}
+
+{% render 'initialize-deferred-scripts', init_scrolling_text: true %}
+
+<noscript>
+    {{ 'component-scrolling-text.css' | asset_url | stylesheet_tag }}
+</noscript>
+
+{% schema %}
+{
+  "name": "t:sections.scrolling_text.name",
+  "tag": "section",
+  "class": "scrolling-text",
+  "settings": [
+    {
+      "type": "font_picker",
+      "id": "text_font_family",
+      "label": "t:sections.scrolling_text.settings.text_font_family.label",
+      "default": "work_sans_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_font_size",
+      "min": 20,
+      "max": 72,
+      "step": 2,
+      "default": 36,
+      "unit": "px",
+      "label": "t:sections.scrolling_text.settings.text_font_size.label"
+    },
+    {
+      "type": "range",
+      "id": "text_animation_duration",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 15,
+      "unit": "s",
+      "label": "t:sections.scrolling_text.settings.text_animation_duration.label"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:sections.scrolling_text.settings.text_color.label"
+    },
+    {
+      "type": "color_background",
+      "id": "text_color_gradient",
+      "label": "t:sections.scrolling_text.settings.text_color_gradient.label"
+    },
+    {
+      "type": "color",
+      "id": "cover_background_color",
+      "label": "t:sections.scrolling_text.settings.cover_background_color.label"
+    },
+    {
+      "type": "color_background",
+      "id": "cover_background_gradient",
+      "label": "t:sections.scrolling_text.settings.cover_background_gradient.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_box_shadow",
+      "label": "t:sections.scrolling_text.settings.use_box_shadow.label"
+    }
+  ],
+  "max_blocks": 1,
+  "blocks": [
+    {
+      "type": "content",
+      "name": "t:sections.scrolling_text.blocks.content.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "scrolling_text",
+          "label": "t:sections.scrolling_text.blocks.content.settings.scrolling_text.label"
+        },
+        {
+          "type": "select",
+          "id": "icon_separator",
+          "label": "t:sections.scrolling_text.blocks.content.icon_separator.label",
+          "options": [
+            {
+              "value": "space",
+              "label": "t:sections.scrolling_text.blocks.content.icon_separator.options.space"
+            },
+            {
+              "value": "dot",
+              "label": "t:sections.scrolling_text.blocks.content.icon_separator.options.dot"
+            },
+            {
+              "value": "dash",
+              "label": "t:sections.scrolling_text.blocks.content.icon_separator.options.dash"
+            },
+            {
+              "value": "sim",
+              "label": "t:sections.scrolling_text.blocks.content.icon_separator.options.sim"
+            }
+          ],
+          "default": "space"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.scrolling_text.presets.name"
+    }
+  ]
+}
+{% endschema %}

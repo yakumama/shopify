@@ -1,0 +1,126 @@
+{% comment %}
+    Render contact block for footer.
+
+    Accepts:
+     - block: {Object}
+{% endcomment %}
+
+{% capture socialsHtml %}
+ {% if settings.social_twitter_link != blank %}
+    <a href="{{ settings.social_twitter_link }}" title="{{ 'general.social.titles.twitter' | t }}" aria-label="twitter">
+        <i class="icon" aria-hidden="true" focusable="false" role="presentation">
+            {% render 'icons-ion' name: 'logo-twitter' %}
+        </i>
+    </a>
+{% endif %} {% if settings.social_facebook_link != blank %}
+    <a href="{{ settings.social_facebook_link }}" title="{{ 'general.social.titles.facebook' | t }}" aria-label="facebook">
+        <i class="icon" aria-hidden="true" focusable="false" role="presentation">
+            {% render 'icons-ion' name: 'logo-facebook' %}
+        </i>
+    </a>
+{% endif %} {% if settings.social_pinterest_link != blank %}
+    <a href="{{ settings.social_pinterest_link }}" title="{{ 'general.social.titles.pinterest' | t }}" aria-label="pinterest">
+        <i class="icon" aria-hidden="true" focusable="false" role="presentation">
+            {% render 'icons-ion' name: 'logo-pinterest' %}
+        </i>
+    </a>
+{% endif %} {% if settings.social_instagram_link != blank %}
+    <a href="{{ settings.social_instagram_link }}" title="{{ 'general.social.titles.instagram' | t }}" aria-label="instagram">
+        <i class="icon" aria-hidden="true" focusable="false" role="presentation">
+            {% render 'icons-ion' name: 'logo-instagram' %}
+        </i>
+    </a>
+{% endif %} {% if settings.social_tiktok_link != blank %}
+    <a href="{{ settings.social_tiktok_link }}" title="{{ 'general.social.titles.tiktok' | t }}" aria-label="tiktok">
+        <i class="icon" aria-hidden="true" focusable="false" role="presentation">
+            {% render 'icons-ion' name: 'logo-tiktok' %}
+        </i>
+    </a>
+{% endif %} {% if settings.social_tumblr_link != blank %}
+    <a href="{{ settings.social_tumblr_link }}" title="{{ 'general.social.titles.tumblr' | t }}" aria-label="tumblr">
+        <i class="icon" aria-hidden="true" focusable="false" role="presentation">
+            {% render 'icons-ion' name: 'logo-tumblr' %}
+        </i>
+    </a>
+{% endif %} {% if settings.social_snapchat_link != blank %}
+    <a href="{{ settings.social_snapchat_link }}" title="{{ 'general.social.titles.snapchat' | t }}" aria-label="snapchat">
+        <i class="icon" aria-hidden="true" focusable="false" role="presentation">
+            {% render 'icons-ion' name: 'logo-snapchat' %}
+        </i>
+    </a>
+{% endif %} {% if settings.social_youtube_link != blank %}
+    <a href="{{ settings.social_youtube_link }}" title="{{ 'general.social.titles.youtube' | t }}" aria-label="youtube">
+        <i class="icon" aria-hidden="true" focusable="false" role="presentation">
+            {% render 'icons-ion' name: 'logo-youtube' %}
+        </i>
+    </a>
+{% endif %} {% if settings.social_vimeo_link != blank %}
+    <a href="{{ settings.social_vimeo_link }}" title="{{ 'general.social.titles.vimeo' | t }}" aria-label="vimeo">
+        <i class="icon" aria-hidden="true" focusable="false" role="presentation">
+            {% render 'icons-ion' name: 'logo-vimeo' %}
+        </i>
+    </a>
+{% endif %}{% endcapture %}
+{% liquid
+    assign socialsHtml = socialsHtml | strip
+%}
+{%- if section.settings.show_logo -%}
+    <div class="footer_logo">
+        {%- render 'footer__block-logo' -%}
+    </div>
+{%- endif -%}
+<div class="footer-contacts__address" {{ block.shopify_attributes }}>
+    <div>
+        {%- if block.settings.address != blank -%}
+            <div class="address-item _address">
+                <div>
+                    <span class="h5">
+                        {{ 'sections.footer.contacts.address' | t }}
+                    </span>
+                    {{ block.settings.address }}
+                </div>
+            </div>
+        {%- endif -%}
+
+        {%- if block.settings.show_email -%}
+            <div class="address-item email">
+                <div>
+                    <a href="mailto:{{ settings.contact_email }}" title="{{ 'header_top.contact_email.title' | t }}">
+                        {{- settings.contact_email -}}
+                    </a>
+                </div>
+            </div>
+        {%- endif -%}
+
+        {%- if block.settings.show_phone -%}
+            <div class="address-item phone">
+                <div>
+                    <p>{{ settings.contact_phone }}</p>
+                </div>
+            </div>
+        {%- endif -%}
+    </div>
+
+    {%- if socialsHtml != blank -%}
+        <div class="footer-contacts__social">
+            {{ socialsHtml }}
+        </div>
+    {%- endif -%}
+
+    {%- if section.settings.payment_enable -%}
+        <div class="footer__payment">
+            <span class="visually-hidden">{{ 'sections.footer.payment' | t }}</span>
+            <ul
+                class="list-payment"
+                role="list"
+                style="--footer__payment-icon-saturate: {{ section.settings.payment_icons_saturate | divided_by: 100.0 }}"
+            >
+                {%- for type in shop.enabled_payment_types -%}
+                    <li class="list-payment__item">
+                        {{ type | payment_type_svg_tag: class: 'icon' }}
+                    </li>
+                {%- endfor -%}
+            </ul>
+        </div>
+    {%- endif -%}
+</div>

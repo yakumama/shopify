@@ -1,0 +1,223 @@
+bought-together {
+    --bought-together--spacing-x: .75rem;
+    --bought-together--items__background: var(--color-foreground-4);
+    --bought-together--items-grid__gap: .5rem;
+    --bought-together--grid-item__width: calc(100% / 1.75);
+    display: block;
+    margin: 0 calc(-1 * var(--bought-together--spacing-x))
+}
+
+bought-together > .heading {
+    padding: 0 var(--bought-together--spacing-x);
+    width: 100%;
+}
+
+bought-together > .items {
+    background: var(--bought-together--items__background);
+    padding: 1rem 0 0;
+}
+
+bought-together > .summary {
+    align-items: center;
+    background: var(--bought-together--items__background);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 1.25rem;
+    font-weight: 600;
+    justify-content: flex-end;
+    gap: .5rem;
+    padding: .75rem var(--bought-together--spacing-x) 1rem;
+}
+
+bought-together > .summary .price--final {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+bought-together > .summary .label {
+    margin: .25rem 0 0;
+}
+
+bought-together > .summary product-form {
+    font-size: 1rem;
+    margin: 0 0 0 1.5rem;
+    min-width: var(--bought-together--grid-item__width);
+}
+
+bought-together > .summary .product-form__submit {
+    width: 100%;
+}
+
+bought-together .items-grid {
+    align-items: flex-start;
+    display: flex;
+    gap: var(--bought-together--items-grid__gap);
+    overflow: auto;
+    padding: 2px;
+}
+
+bought-together .grid-item {
+    display: flex;
+    margin: 0 0 .5rem;
+    position: relative;
+    padding: 0 .75rem;
+    width: calc(var(--bought-together--grid-item__width));
+}
+
+bought-together .grid-item:first-child {
+    margin-left: auto;
+}
+
+bought-together .grid-item:last-child {
+    margin-right: auto;
+}
+
+bought-together .item-checkbox {
+    background: var(--bought-together--items__background);
+    border-radius: 100%;
+    box-shadow: inset 0 0 0 1px var(--color-foreground-10);
+    cursor: pointer;
+    height: 1.375rem;
+    position: absolute;
+    right: 2rem;
+    width: 1.375rem;
+    top: 1.25rem;
+    z-index: 10;
+}
+
+bought-together .item-checkbox svg {
+    color: var(--color-background);
+    left: calc(50% - 6px);
+    opacity: 1;
+    position: absolute;
+    top: calc(50% - 4.5px);
+    transform: scale(0);
+}
+
+bought-together [type='checkbox']:checked ~ .item-checkbox {
+    box-shadow: inset 0 0 0 1rem var(--color-base-accent-1);
+}
+
+bought-together [type='checkbox']:checked ~ .item-checkbox svg {
+    transform: scale(1);
+}
+
+bought-together [type='checkbox'][disabled] ~ .item-checkbox {
+    color: var(--color-foreground-10);
+    cursor: not-allowed;
+}
+
+bought-together [type='checkbox']:focus:focus-visible ~ .item-checkbox {
+    background: var(--color-base-accent-1);
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}
+
+bought-together .grid-item::after {
+    position: relative;
+    align-items: center;
+    content: '+';
+    display: flex;
+    font-size: 1.5rem;
+    font-weight: 600;
+    justify-content: center;
+    height: 2rem;
+    left: .25rem;
+    margin: 6rem -2.5rem 0 0;
+    opacity: .5;
+    width: 1.5rem;
+}
+
+bought-together .grid-item:has([type='checkbox']:checked)::after {
+    opacity: 1;
+}
+
+bought-together .grid-item:last-child::after {
+    display: none;
+}
+
+bought-together .grid-item .item-link {
+    background: var(--color-background);
+    border-radius: 4px;
+    box-shadow: 0 .25rem 1.5rem 0 rgba(var(--color-foreground-rgb), .02);
+    width: 100%;
+    opacity: .5;
+    padding: 1rem;
+}
+
+bought-together [type='checkbox']:checked ~ .item-link {
+    opacity: 1;
+}
+
+bought-together .grid-item .item-title {
+    margin: .5rem 0;
+}
+
+/* TRANSITOIN */
+
+bought-together .item-checkbox,
+bought-together .item-checkbox svg,
+bought-together .grid-item::after,
+bought-together .grid-item .item-link {
+    transition-property: box-shadow, opacity, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+@media (min-width: 480px) {
+    bought-together {
+        --bought-together--grid-item__width: calc(100% / 2.25);
+    }
+}
+
+@media (min-width: 640px) {
+    bought-together {
+        --bought-together--grid-item__width: calc((100% - var(--bought-together--items-grid__gap) * 3) / 3.5);
+    }
+}
+
+@media (min-width: 768px) {
+    bought-together {
+        --bought-together--grid-item__width: calc((100% - var(--bought-together--items-grid__gap) * 3) / 4);
+    }
+}
+
+@media all and (min-width: 990px) {
+    bought-together {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    bought-together > .heading {
+        margin: 0 0 1rem;
+    }
+
+    bought-together > .items {
+        border-radius: 4px 0 0 4px;
+        padding: 2rem 0 1.5rem var(--bought-together--spacing-x);
+        width: 80%;
+    }
+
+    bought-together .items-grid {
+        margin: 0 -.75rem;
+    }
+
+    bought-together > .summary {
+        align-items: center;
+        border-radius: 0 4px 4px 0;
+        flex-direction: column;
+        gap: 0;
+        justify-content: center;
+        padding: 2rem var(--bought-together--spacing-x) 2rem 2rem;
+        width: 20%;
+    }
+
+    bought-together > .summary product-form {
+        margin: 1rem 0 0;
+        width: 100%;
+    }
+
+    bought-together > .summary .product-form__submit {
+        min-width: 100%;
+    }
+}

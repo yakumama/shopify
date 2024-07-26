@@ -1,0 +1,36 @@
+{% comment %}
+      Render Blocks Image with text
+
+      Accepts:
+    - block   {Object}
+{% endcomment %}
+
+{%- for block in blocks -%}
+    {% case block.type %}
+        {%- when 'text' -%}
+            <div class="image-with-text__text rte" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+        {%- when 'heading' -%}
+            <div class="heading">
+                <h2 class="title" {{ block.shopify_attributes }}>
+                    {{ block.settings.heading | escape }}
+                </h2>
+            </div>
+        {%- when 'button' -%}
+            {%- if block.settings.button_label != blank and block.settings.button_link != blank -%}
+                <div class="action animate-arrow" {{ block.shopify_attributes }}>
+                    <a
+                        href="{{ block.settings.button_link }}"
+                        class="button"
+                        style="background: {{ section.settings.button_background_color }};color:{{ section.settings.button_text_color }}"
+                        {% if block.settings.button_link == blank %}
+                            aria-disabled="true"
+                        {% endif %}
+                        {{ block.shopify_attributes }}
+                    >
+                        {{ block.settings.button_label | escape }}
+                        {% render 'icons-solid', name: 'long-arrow-right', css_class: 'icon-arrow extend' %}
+                    </a>
+                </div>
+            {%- endif -%}
+    {%- endcase -%}
+{%- endfor -%}

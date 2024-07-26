@@ -1,0 +1,4 @@
+.facets__price[data-currency-at] .field + .field::before {
+    left: auto;
+    right: -.75rem;
+}

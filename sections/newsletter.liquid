@@ -1,0 +1,234 @@
+{{ 'newsletter.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+    assign emailForm = section.blocks | where: 'type', 'email_form' | first
+    assign buttonStyle = emailForm.settings.button_style_secondary
+    assign block_images = section.blocks | where: 'type', 'image'
+    assign newsletter_height = 0
+    assign newsletter_ratio = 0
+    for block in block_images
+        if block.settings.is_background
+            assign h = block.settings.image.height | default: 236
+            assign r = block.settings.image.aspect_ratio
+            if h > newsletter_height
+                assign newsletter_height = h
+                assign newsletter_ratio = r
+            endif
+        endif
+    endfor
+%}
+
+{% style %}
+    {% if newsletter_height > 0 %}
+      #shopify-section-{{ section.id }} .newsletter {
+        min-height: min({{ newsletter_height }}px, calc(100vw / {{ newsletter_ratio }}));
+      }
+    {% endif %}
+{% endstyle %}
+
+{% if template == 'password' %}
+    <style>
+        #shopify-section-{{ section.id }} {
+          margin: 2rem 0 3rem;
+        }
+        .form-newsletter_container {
+          background-color: #F7F9FB;
+          border-radius: 4px;
+          margin: 2rem auto;
+          max-width: 30rem;
+          padding: 3rem 2rem;
+        }
+
+        @media (min-width: 480px) {
+          .form-newsletter_container {
+            padding: 3.5rem 3rem;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .form-newsletter_container {
+            padding: 5rem;
+          }
+        }
+    </style>
+{% endif %}
+<div class="newsletter text-center color-{{ section.settings.color_scheme }}{% if section.settings.full_width == false %} newsletter--narrow dynamic-page-width{% endif%}">
+    <div class="newsletter__wrapper ">
+        {%- for block in section.blocks -%}
+            {%- case block.type -%}
+                {%- when 'heading' -%}
+                    <h2 class="h1 relative z-10" {{ block.shopify_attributes }}>
+                        {{ block.settings.heading | escape }}
+                    </h2>
+                    {% if block.settings.subtext != blank %}
+                        <div class="subtext-content">
+                            {{ block.settings.subtext }}
+                        </div>
+                    {% endif %}
+                {%- when 'icon' -%}
+                    {% render 'newsletter__block-icon', block: block %}
+                {%- when 'image' -%}
+                    {% render 'newsletter__block-image', block: block %}
+                {%- when 'paragraph' -%}
+                    <div class="newsletter__subheading mb-4 relative z-10" {{ block.shopify_attributes }}>
+                        {{ block.settings.paragraph }}
+                    </div>
+                {%- when 'email_form' -%}
+                    <div class="form-newsletter_container" {{ block.shopify_attributes }}>
+                        {% capture form_html %}{% render 'form-newsletter-subscribe' id: 'contact_form' class: 'newsletter-form' %}{% endcapture %}
+                        {% unless block.settings.button_style_secondary %}
+                            {% assign form_html = form_html | replace: 'button--secondary', 'button--primary' %}
+                        {% endunless %}
+                        {{ form_html }}
+                    </div>
+            {%- endcase -%}
+        {%- endfor -%}
+    </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.newsletter.name",
+  "tag": "section",
+  "class": "spaced-section spaced-section--full-width",
+  "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        {
+          "value": "accent-1",
+          "label": "t:sections.all.colors.accent_1.label"
+        },
+        {
+          "value": "accent-2",
+          "label": "t:sections.all.colors.accent_2.label"
+        },
+        {
+          "value": "background-1",
+          "label": "t:sections.all.colors.background_1.label"
+        },
+        {
+          "value": "background-2",
+          "label": "t:sections.all.colors.background_2.label"
+        },
+        {
+          "value": "inverse",
+          "label": "t:sections.all.colors.inverse.label"
+        }
+      ],
+      "default": "background-1",
+      "label": "t:sections.all.colors.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "default": true,
+      "label": "t:sections.newsletter.settings.full_width.label"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:sections.newsletter.settings.paragraph.content"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "t:sections.newsletter.blocks.heading.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Subscribe to our emails",
+          "label": "t:sections.newsletter.blocks.heading.settings.heading.label"
+        },
+        {
+          "type": "richtext",
+          "id": "subtext",
+          "label": "t:sections.newsletter.blocks.heading.settings.subtext.label",
+          "default": "<p>Sorry for the inconvenience but we're performing some maintenance at the moment. If you need to you can always contact us, otherways we'll be back online shortly!</p>"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "t:sections.newsletter.blocks.maintenance_image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.newsletter.blocks.maintenance_image.settings.title"
+        },
+        {
+          "type": "checkbox",
+          "id": "is_background",
+          "label": "t:sections.newsletter.blocks.maintenance_image.settings.is_background.label"
+        }
+      ]
+    },
+    {
+      "type": "icon",
+      "name": "t:sections.newsletter.blocks.icon.name",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "t:sections.newsletter.blocks.icon.settings.icon.label",
+          "options": [
+            { "value": "maintenance", "label": "Maintenance"},
+            { "value": "relax-shipping", "label": "Truck"},
+            { "value": "relax-returns", "label": "Returns"},
+            { "value": "relax-environment", "label": "Environment"}
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "name": "t:sections.newsletter.blocks.paragraph.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "paragraph",
+          "default": "<p>Be the first to know about new collections and exclusive offers.</p>",
+          "label": "t:sections.newsletter.blocks.paragraph.settings.paragraph.label"
+        }
+      ]
+    },
+    {
+      "type": "email_form",
+      "name": "t:sections.newsletter.blocks.email_form.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary",
+          "default": false,
+          "label": "t:sections.all.button_style_secondary.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.newsletter.presets.name",
+      "blocks": [
+        {
+          "type": "heading",
+          "settings": {
+            "subtext": ""
+          }
+        },
+        {
+          "type": "paragraph"
+        },
+        {
+          "type": "email_form"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

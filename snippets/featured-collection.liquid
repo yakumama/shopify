@@ -1,0 +1,135 @@
+{% comment %}
+    Render featured collection / product list / product recoomendations.
+    It uses section object to get all nessecery data.
+
+    Accepts:
+        - data_source {String}
+{% endcomment %}
+
+{%- liquid
+    assign block_button = section.blocks | where: 'type', 'button' | first
+    assign block_cover = section.blocks | where: 'type', 'magazine_cover' | first
+-%}
+
+{% if block_cover != null %}
+    {% render 'featured-collection__css--magazine', block: block_cover %}
+{% else %}
+    {% render 'featured-collection__css--classic' %}
+{% endif %}
+
+<div class="collection dynamic-page-width{% if block_cover != nil %} magazine {% else %} classic {% endif %}">
+    <div class="collection-inner">
+        <div class="title-wrapper">
+            <div class="heading{% if block_button.settings.position == 'title' and block_button.settings.appearance != 'link' %} heading-with-button{% endif %}">
+                <h2
+                    {% if block_cover == null %}
+                        class="title"
+                    {% endif %}
+                >
+                    {{ section.settings.title }}
+                </h2>
+                {% if block_button.settings.position == 'title' %}
+                    {% render 'featured-collection__block--button', block: block_button %}
+                {% endif %}
+            </div>
+            <div class="title-image">
+                {%- if block_cover.settings.image -%}
+                    <div class="media media--transparent">
+                        {% render 'render-image',
+                            image: block_cover.settings.image,
+                            widths: '480,640,960,#iw#',
+                            sizes: '50vw'
+                        %}
+                    </div>
+                {%- endif -%}
+            </div>
+        </div>
+
+        <slider-component style="background-color: {{ section.settings.products_background_color }};">
+            {%- liquid
+                assign ul_id = 'products--' | append: section.id
+                assign ul_class = 'products'
+                assign has_side_column = false
+
+                if block_cover != null
+                    assign has_side_column = true
+                endif
+
+                if section.settings.products_appearance == 'slider' or section.settings.products_appearance == 'mixed'
+                    assign ul_class = ul_class | append: ' slider slider--tablet slider--mobile grid--peek'
+                endif
+
+                if section.settings.products_appearance == 'slider'
+                    assign ul_class = ul_class | append: ' slider--desktop'
+                endif
+
+                unless section.settings.show_slider_buttons
+                    assign ul_class = ul_class | append: ' slider--no-controls'
+                endunless
+
+                case data_source
+                    when 'collection'
+                        assign items = section.settings.collection.products
+
+                    when 'product_list'
+                        assign items = section.settings.product_list
+
+                    when 'product-recommendations'
+                        assign items = recommendations.products
+                endcase
+
+                if items == null or items.count == 0
+                    if section.settings.show_random
+                        capture handels
+                            render 'helper__get-similar-products', limit: section.settings.products_to_show
+                        endcapture
+                        assign items = handels | split: '|'
+                    else
+                        assign items = 'sample'
+                        assign loopLimit = section.settings.products_to_show | minus: 1
+
+                        for i in (1..99) limit: loopLimit
+                            assign items = items | append: '|sample'
+                        endfor
+
+                        assign items = items | split: '|'
+                    endif
+                endif
+            -%}
+
+            {% render 'grid-items',
+                ul_id: ul_id,
+                ul_class: ul_class,
+                has_side_column: has_side_column,
+                items: items,
+                columns: section.settings.products_per_row,
+                limit: section.settings.products_to_show,
+                badge_size: section.settings.badge_size,
+                image_ratio: section.settings.image_ratio,
+                product_secondary_image: settings.product_card_secondary_image,
+                product_to_cart_button: section.settings.show_to_cart_button,
+                product_show_vendor: settings.product_card_vendor,
+                row_divider: true
+            %}
+            {%- if section.settings.show_slider_buttons -%}
+                {%
+                    render 'slider__buttons'
+                    count: items.count | default: items.size
+                %}
+            {%- endif -%}
+        </slider-component>
+    </div>
+    {%- if block_button.settings.position == 'bottom' -%}
+        <div class="button-wrapper" style="text-align: center; margin: 1rem 0 0;">
+            {% render 'featured-collection__block--button', block: block_button %}
+        </div>
+    {%- endif -%}
+</div>
+
+<link rel="stylesheet" href="{{ 'component-listing-grid.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}" media="print" onload="this.media='all'">
+
+<noscript>
+    {{ 'component-listing-grid.css' | asset_url | stylesheet_tag }}
+    {{ 'component-price.css' | asset_url | stylesheet_tag }}
+</noscript>

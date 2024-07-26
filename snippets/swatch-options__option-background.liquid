@@ -1,0 +1,36 @@
+{%- comment -%}
+    Render product option as swatch.
+
+    Accepst:
+     -  option_name          {String}
+     -  value                {String}
+     -  product_handle       {String}
+{%- endcomment -%}
+
+{%- liquid
+    assign extensions = '.png|.jpg' | split: '|'
+    assign product_handle = product_handle | default: ''
+    assign value_sanitized = value | downcase | remove: ' ' | remove: '/' | remove: ',' | remove: '.'
+    assign image_key = option_name | append: '__' | append: value_sanitized
+
+    unless product_handle == blank
+        for extension in extensions
+            assign image_name = product_handle | append: '__' | append: image_key | append: extension
+            assign swatch_image = images[image_name]
+            unless swatch_image == empty
+                break
+            endunless
+        endfor
+    endunless
+
+    for extension in extensions
+        assign image_name = image_key | append: extension
+        assign swatch_image = images[image_name]
+        unless swatch_image == empty
+            break
+        endunless
+    endfor
+-%}
+
+var(--swatch-background-{{ value_sanitized }},
+{% if swatch_image == empty %}{{ value_sanitized }}{% else %} url('{{ swatch_image | image_url }}'){% endif %})

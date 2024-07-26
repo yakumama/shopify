@@ -1,0 +1,106 @@
+<div class="footer-bottom dynamic-page-width">
+    {%- if shop.features.follow_on_shop? and section.settings.follow_on_shop -%}
+        <div class="footer__follow-on-shop">
+            {% # theme-check-disable %}
+            {{ shop | login_button: action: 'follow' }}
+            {% # theme-check-enable %}
+        </div>
+    {%- endif -%}
+    {%- for block in section.blocks -%}
+        {%- case block.type -%}
+            {% when 'copyright' %}
+                <div class="_copyright" {{ block.shopify_attributes }}>
+                    <p class="copyright__content">{{ block.settings.text | escape }}</p>
+                </div>
+            {% when 'menu' %}
+                <div class="_menu" {{ block.shopify_attributes }}>
+                    <ul>
+                        {% for link in linklists[block.settings.menu].links %}
+                            <li>
+                                <a href="{{ link.url }}">{{ link.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+        {%- endcase -%}
+    {%- endfor -%}
+    {%- if section.settings.show_policy -%}
+        <div class="_policies">
+            <ul class="policies list-unstyled">
+                {%- for policy in shop.policies -%}
+                    {%- if policy != blank -%}
+                        <li>
+                            {%- if forloop.index > 1 -%}
+                                <span class="separator"></span>
+                            {%- endif -%}
+                            <small>
+                                <a href="{{ policy.url }}">{{ policy.title }}</a>
+                            </small>
+                        </li>
+                    {%- endif -%}
+                {%- endfor -%}
+            </ul>
+        </div>
+    {%- endif -%}
+</div>
+
+{% schema %}
+{
+    "name": "t:sections.footer_bottom.name",
+    "max_blocks": 2,
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "follow_on_shop",
+            "label": "t:sections.footer.settings.follow_on_shop.label",
+            "info": "t:sections.footer.settings.follow_on_shop.info",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "show_policy",
+            "label": "t:sections.footer.settings.show_policy.label",
+            "info": "t:sections.footer.settings.show_policy.info",
+            "default": false
+        }
+    ],
+    "blocks": [
+        {
+            "type": "menu",
+            "name": "t:sections.footer_bottom.blocks.menu.name",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "t:sections.footer_bottom.blocks.menu.settings.title.label"
+                },
+                {
+                    "type": "link_list",
+                    "id": "menu",
+                    "default": "footer",
+                    "label": "t:sections.footer_bottom.blocks.menu.settings.menu.label"
+                }
+            ]
+        },
+        {
+            "type": "copyright",
+            "name": "t:sections.footer_bottom.blocks.copyright.name",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "text",
+                    "label": "t:sections.footer_bottom.blocks.copyright.settings.text.label"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+          "name": "t:sections.footer_bottom.presets.name"
+        }
+    ],
+    "enabled_on": {
+        "groups": ["footer"]
+    }
+}
+{% endschema %}

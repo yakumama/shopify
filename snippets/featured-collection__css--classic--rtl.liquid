@@ -1,0 +1,31 @@
+{% comment %}
+    Add RTL styles for section "Featured collection"
+
+     -  block {Object}
+{% endcomment %}
+
+{% style %}
+    @media (min-width: 767px), print {
+        #shopify-section-{{ section.id }} .title-wrapper {
+            padding: {% if section.settings.products_appearance == 'slider' or section.settings.products_appearance == 'mixed' %}0 0 0 7rem{% else %}0{% endif %};
+        }
+
+        #shopify-section-{{ section.id }} .slider-buttons {
+            left: 0;
+            right: auto;
+        }
+    }
+
+    @media (min-width: 990px), print {
+        #shopify-section-{{ section.id }} .title-wrapper {
+            padding: {% if section.settings.products_appearance == 'slider' %}0 0 0 8rem{% else %}0{% endif %};
+        }
+    }
+
+    @media (min-width: calc({{ settings.type_layout_max_width | append: 'px' }} + 2 * 3rem)) {
+        #shopify-section-{{ section.id }} .slider-buttons {
+            left: 3rem;
+            right: auto;
+        }
+    }
+{% endstyle %}

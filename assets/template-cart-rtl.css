@@ -1,0 +1,12 @@
+@media (min-width: 768px) {
+    .cart-items .cart-items__heading--wide {
+        padding-left: 0px;
+        padding-right: 0px
+    }
+}
+@media (min-width: 990px) {
+    .cart-items .cart-items__heading--wide {
+        padding-left: 0px;
+        padding-right: 2rem
+    }
+}

@@ -1,0 +1,35 @@
+{% comment -%}
+    Render image for newsletter section using block object.
+
+    Accepts:
+     - block  {Object}
+{% endcomment -%}
+
+{% liquid
+    assign image_width = block.settings.image.width | default: '420'
+    assign image_sizes = image_width | append: 'px'
+%}
+
+<div
+    id="media-{{ block.id }}"
+    class="newsletter__media {% if block.settings.is_background %}newsletter__media-as-background{% endif %}"
+    style="width: {{ block.settings.image.width | default: 420 }}px;"
+>
+    <div
+        class="media"
+        style="padding-bottom: {% render 'helper__media-padding-bottom' image: block.settings.image image_ratio: 'native' %};"
+        {{ block.shopify_attributes }}
+    >
+        {% if block.settings.image == null %}
+            {{ 'image' | placeholder_svg_tag: 'placeholder' }}
+        {% else %}
+            {% render 'render-image',
+                image: block.settings.image,
+                width: image_width,
+                widths: image_width,
+                sizes: image_sizes,
+                css_class: 'maintenance_image'
+            %}
+        {% endif %}
+    </div>
+</div>

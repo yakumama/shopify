@@ -1,0 +1,65 @@
+{%- comment -%}
+    Renders slide for slider section.
+
+    Accepts:
+    - padding_bottom:   {String}
+    - image:            {Object} is it open initialy
+    - video_url:        {String} or false
+    - link:             {String}
+    - loading_strategy: {String}
+    - width_breaks:     {String}
+    - is_preload:       {Boolean}
+{%- endcomment -%}
+
+{%- liquid
+    assign padding_bottom = padding_bottom | default: ''
+    assign loading_strategy = loading_strategy | default: 'lazy'
+    assign image_width = image_width | default: image.width
+    assign width_breaks = width_breaks | default: '480, 768, 1024, 1920, #iw#' | replace: '#iw#', image.width
+    assign sizes_attr = sizes_attr | default: '100vw, (min-width: #w#px) #w#px' | replace: '#w#', image_width
+
+    if image_height == blank
+        assign image_height = image_width | divided_by: image.aspect_ratio | round
+    endif
+-%}
+
+{% capture imageHtml %}
+    {%- if video_url -%}
+        <div class="embed-responsive embed-responsive-16by9" {% if padding_bottom != blank %} style="padding-bottom: {{ padding_bottom }}%"{% endif %}>
+        {%- if video_url.type == 'youtube' -%}
+            <iframe src="https://www.youtube.com/embed/{{ video_url.id }}?enablejsapi=1&autoplay=1&mute=1&showinfo=0&loop=1&playlist={{ video_url.id }}&controls=0" class="js-youtube" allow="autoplay; encrypted-media" allowfullscreen title="{{ video_url.id }}"></iframe>
+        {%- else -%}
+            <iframe src="https://player.vimeo.com/video/{{ video_url.id }}" class="js-vimeo" allow="autoplay; encrypted-media" allowfullscreen title="{{ video_url.id }}"></iframe>
+        {%- endif -%}
+        </div>
+    {%- elsif image -%}
+        <div class="image--wrapper"{% if padding_bottom != blank %} style="padding-bottom: {{ padding_bottom }}%"{% endif %}>
+            {{ image |
+                image_url:
+                    width: image_width |
+                image_tag:
+                    class: slide_img_css,
+                    data-image-id: image.id,
+                    loading: loading_strategy,
+                    preload: is_preload,
+                    sizes: sizes_attr,
+                    widths: width_breaks
+            }}
+            <span class="visually-hidden">{{ image }}</span>
+        </div>
+    {%- else -%}
+        {{ placeholder | default: 'lifestyle-1' | placeholder_svg_tag: 'placeholder image--wrapper w-full' }}
+    {%- endif -%}
+{% endcapture %}
+
+{% if link == blank %}
+    {{ imageHtml }}
+{% else %}
+    <a
+        href="{{ link }}"
+        class="slider__link {% if video_url == blank %}_image{% else %}_video{% endif %}"
+        aria-label="{{ section.id }}"
+    >
+        {{ imageHtml }}
+    </a>
+{% endif %}

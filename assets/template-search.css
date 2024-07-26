@@ -1,0 +1,128 @@
+.search-section h1 {
+    letter-spacing: -1px;
+    line-height: 110%;
+    margin: var(--title__margin, 0 auto 4rem);
+    text-align: center;
+    text-wrap: balance;
+}
+
+.search-section h1 + form {
+    display: flex;
+    margin: var(--title-form__margin, -2rem auto 4rem);
+    max-width: 30rem;
+}
+
+.search-section h1 + form input[name="q"] {
+    padding-right: 3.25rem;
+}
+
+.search-section h1 + form [type="submit"] {
+    background-color: transparent;
+    border-color: transparent;
+    color: currentColor;
+    height: 3rem;
+    width: 3rem ;
+    min-width: auto;
+    margin: -1px -1px -1px calc(-3rem + 1px);
+}
+
+.search-section h1 + form [type="submit"] svg {
+    width: 100%;
+    height: 100%;
+}
+
+.search__tabs {
+    margin-bottom: 4rem;
+    position: relative;
+}
+
+.search__tablist {
+    display: flex;
+    gap: .5rem;
+    padding: 3px; /* don't trim focus ring  */
+    overflow-x: auto;
+    width: 100%;
+}
+
+.search__tablist::before {
+    content: '';
+    margin-left: auto;
+}
+
+.search__tablist::after {
+    content: '';
+    margin-right: auto;
+}
+
+.search__tab {
+    border-radius: var(--button__border-radius);
+    flex-shrink: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.search__tab-active {
+    box-shadow: inset 0 0 0 100rem var(--color-foreground);
+    color: var(--color-background);
+}
+
+.search__tab a {
+    border-radius: var(--button__border-radius);
+    display: inline-block;
+    padding: 0.375rem 1.125rem;
+}
+
+.search__tab .count::before {
+    content: '(';
+}
+
+.search__tab .count::after {
+    content: ')';
+}
+
+.search__tab-content {
+    margin: 2rem 0;
+}
+
+.search-section .collection--empty,
+.search-section .blog-articles:empty[data-message-no-results],
+.search-section .pages-listing:empty[data-message-no-results] {
+    color: var(--color-foreground-75);
+    display: block;
+    margin: 4rem auto 6rem;
+    max-width: 24rem;
+    text-align: center;
+}
+
+.search-section .blog-articles:empty::before,
+.search-section .pages-listing:empty::before {
+    content: attr(data-message-no-results);
+}
+
+@media (min-width: 768px) {
+    .search-section {
+        --font-h1__multiplier: .08333rem;
+        --title__margin: 4rem auto 6rem;
+        --title-form__margin: -3rem auto 6rem;
+    }
+}
+
+@media (min-width: 990px) {
+    .search-section {
+        --font-h1__multiplier: .11111rem;
+        --title__margin: 6rem auto 8rem;
+        --title-form__margin: -4rem auto 8rem;
+    }
+}
+
+@media (hover: hover) {
+    .search__tab:not(.search__tab-active):hover {
+        box-shadow: inset 0 0 0 100rem var(--color-foreground-10);
+    }
+
+    .search-section h1 + form [type="submit"]:hover {
+        box-shadow: none;
+    }
+}

@@ -1,0 +1,288 @@
+{%- comment -%}
+    Render items grid
+
+    Accepst:
+    - ul_id                   {String}
+    - ul_class                {String}
+    - has_side_column         {Array}   Items to render
+    - items                   {Array}   Items to render
+    - columns                 {Number}
+    - limit                   {Number}
+    - mode                    {String}  grid|list
+    - badge_size              {String}
+    - image_ratio             {String}  Image ration for item
+    - product_secondary_image {Boolean}
+    - product_show_vendor     {Boolean}
+    - product_to_cart_button  {Boolean}
+    - product_description     {Boolean}
+    - row_divider             {Boolean}
+    - preload_items_image     {Number}  Shopify preloads MAX ONLY 2 images per document
+    - loading_eager_image     {Number}  Main images of grid items loading eager
+{%- endcomment -%}
+
+{%- liquid
+    assign columns = columns | plus: 0
+    assign limit = limit | default: 50 | plus: 0
+    assign mode = mode | default: 'grid'
+    assign preloadItemsImage = preload_items_image | plus: 0
+    assign loadingEagerImage = loading_eager_image | plus: 0
+-%}
+
+{%- comment -%}
+    Prepare settings for item image
+{%- endcomment -%}
+{%- liquid
+    capture image_sizes_config
+        render 'grid-item--item-image--sizes', mode: mode, columns: columns, has_side_column: has_side_column
+    endcapture
+-%}
+
+{%- liquid
+    if ul_id == null
+        assign ulSelector = '[data-mode="' | append: mode | append: '"][data-columns="' | append: columns | append: '"]'
+    else
+        assign ulSelector = '#' | append: ul_id
+    endif
+-%}
+
+<style>
+    {{ ulSelector }} {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 1.25rem -.5rem 0;{% if mode == 'grid' %}
+        gap: var(--grid-item-gap, 1rem);{% endif %}
+    }
+
+    {{ ulSelector }} squama-item {
+        display: block;
+        position: relative;
+    }{% if product_description %}
+
+    {{ ulSelector }} .item-description {
+        display: none;
+        {% if mode == 'grid' -%}
+        font-size: calc(1rem - 2px);
+        margin: .5rem 0 0;{% endif %}
+        {% if mode == 'list' -%}
+        font-size: calc(1rem - 1px);
+        margin: 0 0 .5rem;{% endif %}
+    }{% endif %}{% if product_secondary_image %}
+
+    .item-image__with-secondary img + img {
+        opacity: 0;
+    }{% endif %}
+
+    {{ ulSelector }} .item-link {
+        background: var(--grid-item__background-color, var(--color-background));
+        border-radius: var(--product-card--border-radius);
+        display:{% if mode == 'grid' %} block{% else %} grid{% endif %};
+        padding: .75rem;{% if mode == 'list' %}
+        align-items: flex-start;
+        --columns-gap: 1rem;
+        --columns-count: 2;
+        column-gap: var(--columns-gap);
+        grid-template-columns: min(var(--image-width, auto), calc(50% - var(--columns-gap, 0) / var(--columns-count, 1))) auto;
+        {% endif %}
+    }
+
+    .grid-item .item-price > * {
+        display: inline-block;
+        margin: 0 .5rem 0 0;
+    }
+
+    .grid-item .item-price > :last-child {
+        margin: 0;
+    }
+
+    #main-collection-products:empty {
+        display: none;
+    }
+    #main-collection-products ~ .pagination {
+        display: block;
+        padding-bottom: 2rem;
+    }
+
+    @media (min-width: 768px), print {
+        #main-collection-products {
+            min-height: 24rem;
+        }
+
+        .grid-item .item-link {
+            border: 1px solid transparent;{% comment %} This selector is lighter. It allows to overrides border property in component CSS easier.{% endcomment %}
+        }
+
+        {{ ulSelector }} {
+            margin: 0 -.75rem;
+        }
+
+        {{ ulSelector }} .item-link {
+            padding: 1rem;
+        }{% if product_description %}
+
+        {{ ulSelector }} squama-item[data-status="ready"] .item-description {
+            display: block;
+            margin: 1.5rem 0 0;
+        }{% endif %}
+    }
+
+    {% if mode == 'grid' -%}
+    {{ ulSelector }} .grid-item {
+        width:{% if columns > 1 %} calc(50% - var(--grid-item-gap, 1rem) / 2){% else %} 100%{% endif %};
+    }{% if columns > 2 %}
+
+    @media (min-width: 640px), print {
+        {{ ulSelector }} .grid-item {
+            width: calc(33.333333% - 2 * var(--grid-item-gap, 1rem) / 3);
+        }
+    }{% endif %}{% if columns > 3 %}
+
+    @media (min-width: 768px), print {
+        {{ ulSelector }} .grid-item {
+            width: calc(25% - 3 * var(--grid-item-gap, 1rem) / 4);
+        }
+    }{% endif %}{% if columns > 4 %}
+
+    @media (min-width: 990px), print {
+        {{ ulSelector }} .grid-item {
+            width: calc(20% - 4 * var(--grid-item-gap, 1rem) / 5);
+        }
+    }{% endif %}{% if columns > 5 %}
+
+    @media (min-width: 1200px), print {
+        {{ ulSelector }} .grid-item {
+            width: calc(16.666667% - 5 * var(--grid-item-gap, 1rem) / 6);
+        }
+    }{% endif %}
+
+    {%- else -%}
+    {{ ulSelector }} .grid-item {
+        width: 100%;
+    }
+
+    {{ ulSelector }} .grid-item:nth-child(n+2)::before {
+    /*    background-color: var(--color-foreground-8);*/
+        content: '';
+        display: block;
+        height: 2px;
+        margin: 1rem auto;
+        width: 100%;
+    }
+
+    {{ ulSelector }} .item-image {
+        grid-row: span 2;
+    }
+
+    {{ ulSelector }} .item-price .price--final {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    {{ ulSelector }} .item-actions-wrapper > button {
+        border-radius: 3px;
+        height: 3rem;
+        margin: 1rem 0 0;
+        max-width: 12rem;
+        width: 100%;
+    }
+
+    @media all and (min-width: 480px) {
+        {{ ulSelector }} .item-link {
+            --columns-gap: 2rem;
+        }
+    }
+
+    @media all and (min-width: 768px) {
+        {{ ulSelector }} .grid-item:nth-child(n+2)::before {
+            width: calc(100% - 3rem);
+        }
+
+        {{ ulSelector }} .item-link {
+            grid-template-columns: min(var(--image-width, auto), calc(33.3% - var(--columns-gap, 0) / var(--columns-count, 1))) auto
+        }
+
+        {{ ulSelector }} [data-product-id] .item-link {
+            --columns-count: 3;
+            grid-template-columns: min(var(--image-width, auto), calc(33.3% - var(--columns-gap, 0) / var(--columns-count, 1))) auto min(12rem, calc(33.3% - var(--columns-gap, 0) / var(--columns-count, 1)));
+        }
+
+        {{ ulSelector }} .item-image {
+            grid-row: span 1;
+        }
+
+        {{ ulSelector }} .item-price .price--final {
+            font-size: 1.5rem;
+        }
+
+        {{ ulSelector }} .item-actions-wrapper > button {
+            margin: 2rem 0 0;
+        }
+    }
+    {%- endif %}
+</style>
+
+{% if request.locale.iso_code contains 'ar' %}
+    <style>
+        [dir="rtl"] .grid-item .item-price > * {
+            margin: 0 0 0 .5rem;
+        }
+    </style>
+{% endif %}
+
+<ul
+    {% unless ul_id == null %}
+        id="{{ ul_id }}"
+    {% endunless %}
+    {% unless ul_class == null %}
+        class="{{ ul_class }}"
+    {% endunless %}
+    data-mode="{{ mode }}"
+    data-columns="{{ columns }}"
+    data-id="{{ section.id }}"
+>
+    {%- liquid
+        for itemCandidate in items limit: limit
+            if itemCandidate.object_type != null
+                assign item = itemCandidate
+            else
+                if all_products[itemCandidate] != nill
+                    assign item = all_products[itemCandidate]
+                endif
+            endif
+
+            assign preloadImage = false
+            if forloop.index0 < preloadItemsImage
+                assign preloadImage = true
+            endif
+
+            assign loadingStrategy = 'lazy'
+            if forloop.index0 < loadingEagerImage
+                assign loadingStrategy = 'eager'
+            endif
+
+            case item.object_type
+                when 'product'
+                    capture item_html
+                        render 'grid-item-product', mode: mode, product: item, image_ratio: image_ratio, image_loading: loadingStrategy, image_sizes_config: image_sizes_config, image_preload: preloadImage, show_secondary_image: product_secondary_image, show_to_cart_button: product_to_cart_button, show_vendor: product_show_vendor, show_description: product_description, uniq_id: ul_id
+                    endcapture
+                    capture badges_html
+                        render 'badge-onsale', product: item, size: badge_size
+                        render 'badge-soldout', product: item, size: badge_size
+                    endcapture
+                    echo item_html | replace: '<!-- badges_html -->', badges_html
+
+                when 'article', 'page'
+                    continue
+
+                else
+                    render 'grid-item-product', product: item, image_sizes_config: image_sizes_config, show_secondary_image: product_secondary_image, show_to_cart_button: product_to_cart_button, show_vendor: product_show_vendor, show_description: product_description, image_ratio: image_ratio
+            endcase
+
+            if row_divider and forloop.last == false
+                assign modulo_index = forloop.index | modulo: columns
+                if modulo_index == 0
+                    echo '<li class="rows-divider"></li>'
+                endif
+            endif
+        endfor
+    -%}
+</ul>

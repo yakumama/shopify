@@ -1,0 +1,16 @@
+.product__info-block--share .share-label {
+    margin: 0 0 0 2.5rem;
+}
+.product__title--rating + .product__title--sku {
+    text-align: left;
+}
+.product-media-modal__toggle {
+    right: auto;
+    left: 1rem;
+}
+@media (min-width: 768px) {
+    .product-media-modal__toggle {
+        right: auto;
+        left: 2rem;
+    }
+}

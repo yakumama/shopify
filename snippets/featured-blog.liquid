@@ -1,0 +1,155 @@
+{%- comment -%}
+    Render featured blog / articles list.
+
+    Accepts:
+        - blog           {Object}  Can't be omitted. Set `nil` when don't use it.
+        - articles_list  {Array}   Can't be omitted. Set `nil` when don't use it.
+        - articles_limit {Number}
+        - heading        {String}
+        - excerpt_limit  {Number}
+        - show_author    {Boolean}
+        - show_comments  {Boolean}
+        - show_date      {Boolean}
+        - show_image     {Boolean}
+        - show_link      {Boolean}
+        - tags_limit     {Number}
+        - shopify_attrs  {Object}  (Options)
+{%- endcomment -%}
+
+{%- liquid
+    if blog != null
+        if blog.articles_count < articles_limit
+            assign articles_limit = blog.articles_count
+        endif
+
+        assign articles_list = blog.articles
+    endif
+
+    if articles_list != null
+        if articles_list.size != null and articles_list.size < articles_limit
+            assign articles_limit = articles_list.size
+        endif
+
+        if articles_list.count != null and articles_list.count < articles_limit
+            assign articles_limit = articles_list.count
+        endif
+    endif
+-%}
+
+{{ 'component-article-tags.css' | asset_url | stylesheet_tag }}
+{{ 'component-article-card.css' | asset_url | stylesheet_tag }}
+{{ 'section-featured-blog.css' | asset_url | stylesheet_tag }}
+
+{% render 'featured-blog__styles', posts_limit: articles_limit %}
+
+<div class="featured-blog dynamic-page-width" {{ shopify_attrs }}>
+    <div class="heading _before{% if heading == blank %} title-wrapper-with-link--no-heading{% endif %}">
+        <h2 class="title">
+            {{ heading }}
+        </h2>
+    </div>
+
+    {%- liquid
+        if articles_limit < blog.articles_count or articles_limit < articles_list.size
+            assign posts_exceed_limit = true
+        endif
+    -%}
+
+    <slider-component class="slideshow" data-slider-item=".blog__post">
+        <ul
+            class="blog__posts articles-wrapper slider slider--tablet slider--mobile"
+            role="list"
+        >
+            {%- for article_candidate in articles_list limit: articles_limit -%}
+                {%- liquid
+                    if article_candidate.object_type != null
+                        assign article = article_candidate
+                    else
+                        assign article_candidate = article_candidate | strip
+                        if articles[article_candidate] != null
+                            assign article = articles[article_candidate]
+                        else
+                            assign article = null
+                        endif
+                    endif
+
+                    if article == null or article == empty
+                        continue
+                    endif
+                -%}
+                <li class="blog__post grid__item article slider__slide slider__slide--full-width">
+                    {%- capture article_card_html -%}
+            {%- render 'article-card'
+              article: article
+              excerpt_limit: excerpt_limit
+              show_author: show_author
+              show_comments: show_comments
+              show_date: show_date
+              show_image: show_image
+              show_link: show_link
+              tags_position: 'on_image'
+              tags_limit: tags_limit
+            -%}
+          {%- endcapture -%}
+                    {{ article_card_html | replace: '<h2 class=', '<h3 class=' | replace: '</h2>', '</h3>' }}
+                </li>
+            {% else %}
+                {% for i in (1..articles_limit) %}
+                    <li class="blog__post grid__item article slider__slide slider__slide--full-width">
+                        {%- capture article_card_html -%}
+              {%- render 'article-card'
+                article: nil
+                excerpt_limit: excerpt_limit
+                show_author: show_author
+                show_comments: show_comments
+                show_date: show_date
+                show_image: show_image
+                show_link: show_link
+                tags_position: 'on_image'
+                tags_limit: tags_limit
+              -%}
+            {%- endcapture -%}
+                        {{ article_card_html | replace: '<h2 class=', '<h3 class=' | replace: '</h2>', '</h3>' }}
+                    </li>
+                {%- endfor -%}
+            {%- endfor -%}
+        </ul>
+        {% if articles_limit > 1 -%}
+            <div class="slider-buttons no-js-hidden">
+                <button
+                    type="button"
+                    class="slider__button slider-button--prev button--tertiary"
+                    name="previous"
+                    aria-label="{{ 'accessibility.previous_slide' | t }}"
+                >
+                    {% render 'icons-theme', name: 'arrow-left', css_class: 'icon' %}
+                </button>
+                <button
+                    type="button"
+                    class="slider__button slider-button--next button--tertiary"
+                    name="next"
+                    aria-label="{{ 'accessibility.next_slide' | t }}"
+                >
+                    {% render 'icons-theme', name: 'arrow-right', css_class: 'icon' %}
+                </button>
+                <div class="slider-counter caption">
+                    <span class="slider-counter--current">1</span>
+                    <span aria-hidden="true"> - </span>
+                    <span class="visually-hidden">{{ 'accessibility.of' | t }}</span>
+                    <span class="slider-counter--total">{{ articles_limit }}</span>
+                </div>
+            </div>
+        {%- endif %}
+    </slider-component>
+
+    {%- comment -%}
+        {% if section.settings.show_view_all -%}
+          <div class="blog__view-all">
+            <a href="{{ section.settings.blog.url }}" class="blog__button button{% unless section.settings.view_all_style_secondary %} button--primary{% else %} button--secondary{% endunless %} animate-arrow">
+              <span>{{ 'sections.featured_blog.view_all' | t }}</span>
+              {% render 'icons-solid' name: 'long-arrow-right' css_class: 'icon-arrow extend' %}
+            </a>
+          </div>
+        {%- endif %}
+    {%- endcomment -%}
+</div>

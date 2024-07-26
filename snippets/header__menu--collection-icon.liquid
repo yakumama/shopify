@@ -1,0 +1,30 @@
+{% comment -%}
+    Render icon for collection in the header menu dropdown.
+
+    Accepts:
+
+     -  link {Object}
+{% endcomment -%}
+
+{% if link.type == 'collection_link' %}
+    {%- liquid
+        assign icon_width = section.settings.collection_icon_width
+        assign icon_width_2x = icon_width | times: 2
+        assign icon_sizes = icon_width | append: 'px'
+        assign icon_widths = icon_width | append: ', ' | append: icon_width_2x
+        assign inline_style = 'width: Wpx' | replace: 'W', icon_width
+        assign image = section.settings.collection_icon | default: collections[link.handle].featured_image
+    -%}
+    {% if image != null %}
+        {{
+            image
+            | image_url: width: icon_width_2x
+            | image_tag:
+                class: 'collection__item-image',
+                sizes: icon_sizes,
+                loading: 'lazy',
+                widths: icon_widths,
+                style: inline_style
+        }}
+    {% endif %}
+{% endif %}

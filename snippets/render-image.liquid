@@ -1,0 +1,21 @@
+{%- comment -%}
+    Accepts:
+     -  image      {Object}
+     -  sizes      {String}  (Optional)
+     -  widths     {String}  (Optional)
+     -  is_preload {Boolean} (Optional)
+{%- endcomment -%}
+
+{%- liquid
+    assign sizes = sizes | default: '(max-width: 639px) 43vw, (max-width: 767px) 29vw, (max-width: 989px) 20vw, (max-width: 1279px) 18vw, 211px'
+    assign widths = widths | default: '240,320,400,480,560,640,900,1024,1920,#iw#' | replace: '#iw#', image.width
+    assign loading_strategy = 'lazy'
+    if is_preload
+        assign loading_strategy = 'eager'
+    endif
+-%}
+{{
+    image
+    | image_url: width: image.width
+    | image_tag: class: css_class, sizes: sizes, loading: loading_strategy, widths: widths, preload: is_preload
+}}

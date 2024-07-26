@@ -1,0 +1,109 @@
+{%- comment -%}
+    Critical styles for `icons-bar` snippet.
+
+    Accepts:
+     -  enable_slider      {Boolean}
+     -  icon_size          {Number}  Units - rem.
+     -  show_border_bottom {Boolean}
+     -  show_border_top    {Boolean}
+     -  show_separator     {Boolean}
+     -  show_shadow        {Boolean}
+     -  visibility         {String}
+{%- endcomment -%}
+
+{% style %}
+    {% if show_shadow %}#shopify-section-{{ section.id }} {
+        box-shadow: 0 8px 10px -10px var(--color-foreground-20);
+    }{% endif %}
+
+    #shopify-section-{{ section.id }} .icons-bar {
+        line-height: 1.25rem;{% if show_border_top %}
+        border-top: 2px solid var(--color-foreground-4);
+        padding-top: 1.5rem;{% endif %}{% if show_border_bottom %}
+        border-bottom: 2px solid var(--color-foreground-4);
+        padding-bottom: 1.5rem;{% endif %}{% if visibility == 'desktop' %}
+        display: none;{% endif %}
+    }
+    .icons-bar-inner {
+        display: flex;
+    }{% if enable_slider %}
+    .icons-bar-inner.slider {
+        padding: 0 1.5rem;
+        scroll-padding-left: 1.5rem;
+    }
+    {% endif %}
+    .icons-bar-inner .icons-bar-item {
+        align-items: center;
+        display: flex;
+        gap: .5rem;
+        justify-content: center;
+        margin: .5rem 0;
+        width: 100%;
+    }
+    .icons-bar-icon {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        height: {{ icon_size }}px;
+        width: {{ icon_size }}px;
+    }
+    .icons-bar-icon .ionicon {
+        height: min(100%, 3rem);
+        width: min(100%, 3rem);
+    }
+    {% if show_separator %}
+    .icons-bar-item-separator {
+        background-color: var(--color-foreground-20);
+        margin: .5rem 0;
+        height: 1px;
+    }{% endif %}
+    .slider.slider--mobile .slider__slide.icons-bar-item {
+        margin: .5rem 0;
+        overflow: visible;
+    }
+    .slider-buttons {
+        display: none; {% comment %}Hide slider initally to prevent CLS {% endcomment %}
+    }
+    .icons-bar .slider-buttons {
+        position: static;
+        margin: 0;
+    }
+    .icons-bar .slider-button {
+        background: transparent;
+        position: absolute;
+        left: 0;
+        top: 0;
+        border: 0;
+        bottom: 0;
+        margin: 0;
+        min-width: auto;
+        padding: 0;
+        overflow: hidden;
+    }
+    .icons-bar .slider-button--next {
+        left: auto;
+        right: 0;
+    }
+    @media screen and (min-width: 768px) {
+        {% unless visibility == 'all' %}#shopify-section-{{ section.id }} .icons-bar {
+            display:{% if visibility == 'desktop' %} block{% else %} none{% endif %}
+        }{% endunless %}
+        .icons-bar-inner {
+            display: flex;
+            justify-content: space-evenly;
+        }
+        .icons-bar-inner .icons-bar-item {
+            width: auto;
+            flex-shrink: 1;
+        }
+        .slider-buttons {
+            display: none;
+        }
+        {% if show_separator %}
+        .icons-bar-item-separator {
+            background-color: var(--color-foreground-4);
+            height: auto;
+            width: 2px;
+        }{% endif %}
+    }
+{% endstyle %}

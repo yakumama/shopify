@@ -1,0 +1,36 @@
+scroll-top {
+    position: fixed;
+    z-index: 50;
+    cursor: pointer;
+    bottom: 16vh;
+    right: 1rem;
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    background: var(--color-background);
+    border-radius: 3px;
+    transform: translateY(50%);
+    box-shadow: 5px 5px 0px rgba(0,0,0,.1);
+    transition: box-shadow 3s;
+    transition-timing-function: cubic-bezier(.67,.17,.32,.95);
+    transform: rotate(180deg);
+    border: 1px solid var(--color-foreground-8);
+    padding: .5rem;
+}
+
+scroll-top svg {
+    width: 1.5rem;
+    height: 1.5rem;
+/*    animation: pulse 1.5s ease-out infinite normal;*/
+}
+
+@media screen and (min-width: 760px) {
+    scroll-top {
+        right: 2rem;
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(.9); }
+    50% { transform: scale(1); }
+    100% { transform: scale(.9); }
+}

@@ -1,0 +1,89 @@
+.our-collections.slider.slider--tablet {
+    scroll-padding-left: 0;
+}
+
+.our-collections li > .item-link {
+    background: var(--our-collections-card__background-color, transparent);
+}
+
+.our-collections li > a,
+.our-collections li > a .item-title,
+.our-collections li > a .media {
+  border-radius: var(--our-collections__corners, 0);
+}
+
+.our-collections .item-title {
+    background: var(--color-background);
+    box-shadow: 0 .25rem 1rem 0 var(--color-foreground-4);
+}
+
+.our-collections.background-various li:nth-child(9n + 1) > .item-link,
+.our-collections.slider--desktop.background-various li:nth-child(3n+1) > .item-link {
+  background: #dfe2f0;
+}
+
+.our-collections.background-various li:nth-child(9n + 2) > .item-link,
+.our-collections.background-various li:nth-child(9n) > .item-link,
+.our-collections.slider--desktop.background-various li:nth-child(3n) > .item-link {
+  background: #d2ece6;
+}
+
+.our-collections.background-various li:nth-child(9n + 3) > .item-link,
+.our-collections.background-various li:nth-child(9n + 6) > .item-link,
+.our-collections.slider--desktop.background-various li:nth-child(3n+2) > .item-link {
+  background: #fde0b3;
+}
+
+.our-collections.background-various li:nth-child(9n + 4) > .item-link,
+.our-collections.background-various li:nth-child(9n + 8) > .item-link {
+  background: #e6f1fb;
+}
+
+.our-collections.background-various li:nth-child(9n + 5) > .item-link,
+.our-collections.background-various li:nth-child(9n + 7) > .item-link {
+  background: #f0dfdf;
+}
+
+@media (hover: hover) {
+    .our-collections li img {
+        transition: scale .2s;
+    }
+
+    .our-collections li > a:hover img {
+        scale: 1.05;
+    }
+
+    .our-collections li > a:hover .item-title {
+        color: var(--color-foreground-75);
+    }
+}
+
+@media (min-width: 990px) {
+    .our-collections.slider--desktop {
+        position: relative;
+    }
+
+    .our-collections.slider--desktop ~ .slider-buttons {
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        margin-bottom: 2rem;
+    }
+
+    .our-collections.slider--desktop ~ .slider-buttons .slider-counter {
+        display: none;
+    }
+
+    .our-collections.slider:not(.slider--desktop) {
+        overflow: visible;
+    }
+}
+
+/* RTL */
+
+@media (min-width: 990px) {
+        [dir="rtl"] .our-collections.slider--desktop ~ .slider-buttons {
+            left: 0;
+            right: auto;
+        }
+}

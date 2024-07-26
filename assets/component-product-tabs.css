@@ -1,0 +1,156 @@
+product-tabs {
+    display: block;
+}
+
+.product-section-tabs {
+    margin-top: 5rem;
+}
+
+.expanded-inner .tab-title {
+    font-size: 1.75rem;
+    margin: 0;
+    letter-spacing: -1px;
+    line-height: 1.75rem;
+    padding: 1.25rem .25rem .5rem;
+}
+
+.expanded-inner .tab-title span::after {
+    background: currentColor;
+    content: '';
+    display: inline-block;
+    height: 4px;
+    margin: 0 0 0 1rem;
+    width: 4rem;
+}
+
+.expanded-inner .tab-title b {
+    font-weight: 700;
+}
+
+.product-tabs .expanded-inner .tab-content {
+    margin: 0;
+    padding: .5rem .25rem 1.25rem;
+}
+
+.product-tabs .expanded-inner .tab-content:last-child {
+    border-bottom-width: 0;
+}
+
+.product-tabs  .expanded-inner .tab-content .spr-review:first-child {
+    border-top: 0;
+    margin-top: 0;
+}
+
+@media all and (min-width: 768px) {
+    .expanded-inner {
+        display: flex;
+        flex-wrap: wrap;
+        margin: -2rem 0 0;
+    }
+
+    .expanded-inner .tab-title {
+        font-size: 1.25rem;
+        padding-bottom: 2.5rem;
+        padding-right: 2rem;
+        padding-top: 3rem;
+        width: 30%;
+    }
+
+    .expanded-inner .tab-title > span {
+        display: block;
+        max-width: 18rem;
+    }
+
+    .expanded-inner .tab-title span::after {
+        height: 3px;
+    }
+
+    .expanded-inner .tab-title .spr-badge {
+        display: block;
+        font-size: 1rem;
+        margin: 1rem 0;
+    }
+
+    .expanded-inner .tab-title .spr-summary-actions-newreview {
+        display: inline-block;
+        float: none;
+    }
+
+    .product-tabs .expanded-inner .tab-content {
+        padding-bottom: 2.5rem;
+        padding-top: 1rem;
+        width: 70%;
+    }
+
+    .expanded-inner .tab-title:has([data-rating="0.0"]) + .tab-content .spr-summary {
+        display: block;
+        margin: 0 0 .5rem;
+    }
+
+    .expanded-inner .tab-content .spr-form {
+        margin: 0 0 2rem;
+    }
+
+    .expanded-inner .tab-content .spr-reviews {
+        margin: 0;
+    }
+
+    .expanded-inner .tab-content .spr-review {
+        padding: 0;
+    }
+}
+
+@media all and (min-width: 990px) {
+    .expanded-inner .tab-title {
+        font-size: 1.75rem;
+        padding-bottom: 3.5rem;
+        padding-top: 4rem;
+    }
+
+    .expanded-inner .tab-title span::after {
+        height: 4px;
+    }
+
+    .product-tabs  .expanded-inner .tab-content {
+        padding-bottom: 3.5rem;
+        padding-top: 2rem;
+    }
+}
+
+.product-tabs [role="tablist"] {
+    display: flex;
+    gap: .5rem;
+    overflow-x: auto;
+    padding: 0 0 .5rem;
+    width: 100%;
+}
+
+.product-tabs [role="tablist"] .tab-title {
+    border-radius: var(--button__border-radius);
+    flex-shrink: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    padding: .375rem 1.125rem;
+    white-space: nowrap;
+}
+
+.product-tabs .tab-title:first-child {
+    margin-left: auto;
+}
+
+.product-tabs .tab-title:last-child {
+    margin-right: auto;
+}
+
+.product-tabs .tab-title label {
+    cursor: pointer;
+}
+
+.product-tabs .tab-content {
+    margin: 2.5rem 0 3rem;
+}
+
+.product-tabs .tab-content > .rte {
+    margin: .5rem 0;
+}

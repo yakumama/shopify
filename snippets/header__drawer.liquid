@@ -1,0 +1,220 @@
+{% comment %}
+    Render header drawer.
+
+    Accepts:
+     - menu                   {Object}
+     - show_switcher_language {Boolean}
+     - show_switcher_currency {Boolean}
+     - show_switcher_country  {Boolean}
+{% endcomment %}
+<header-drawer>
+    <details class="menu-drawer-container">
+        <summary
+            class="menu-drawer-toggler header__icon header__icon--menu header__icon--summary button button--small"
+            aria-label="{{ 'sections.header.menu' | t }}"
+        >
+            <span>
+                {% render 'theme-icons', name: 'menu' %}
+            </span>
+        </summary>
+        <div id="menu-drawer" class="menu-drawer motion-reduce" tabindex="-1">
+            <div class="menu-drawer__inner-container">
+                <div class="menu-drawer__navigation-header">
+                    <span>{{ 'sections.header.title' | t }}</span>
+                    <svg aria-hidden="true" focusable="false" role="presentation" width="19" height="19" class="icon-x">
+                        <use href="#icon-x" />
+                    </svg>
+                </div>
+                <div class="menu-drawer__navigation-container">
+                    <nav class="menu-drawer__navigation menu-drawer__section-content">
+                        <ul class="menu-drawer__menu list-menu menu-drawer__menu-item-top" role="list">
+                            {%- for link in menu.links -%}
+                                {%- if link.links != blank -%}
+                                    <li>
+                                        <details>
+                                            <summary class="focus-inset{% if link.child_active %} menu-drawer__menu-item--active{% endif %}">
+                                                <a
+                                                    href="{{ link.url }}"
+                                                    class="menu-drawer__menu-item-top list-menu__item"
+                                                >
+                                                    {{ link.title | escape }}
+                                                </a>
+                                                <svg
+                                                    aria-hidden="true"
+                                                    focusable="false"
+                                                    role="presentation"
+                                                    class="icon icon-caret"
+                                                >
+                                                    <use href="#icon-caret" />
+                                                </svg>
+                                            </summary>
+                                            <div
+                                                id="link-{{ link.title | escape }}"
+                                                class="menu-drawer__submenu motion-reduce"
+                                                tabindex="-1"
+                                            >
+                                                <div class="menu-drawer__inner-submenu">
+                                                    <ul
+                                                        class="childlist-menu--disclosure list-menu"
+                                                        role="list"
+                                                        tabindex="-1"
+                                                    >
+                                                        {% render 'header__menu--dropdown',
+                                                            links: link.links,
+                                                            activate_dropdown: 'on_hover',
+                                                            class_item: 'list-menu__item link--text focus-inset'
+                                                        %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </details>
+                                    </li>
+                                {%- else -%}
+                                    <li>
+                                        <a
+                                            href="{{ link.url }}"
+                                            class="menu-drawer__menu-item list-menu__item focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+                                            {% if link.current %}
+                                                aria-current="page"
+                                            {% endif %}
+                                        >
+                                            {{ link.title | escape }}
+                                        </a>
+                                    </li>
+                                {%- endif -%}
+                            {%- endfor -%}
+
+                            {% if shop.customer_accounts_enabled %}
+                                <li class="item--account">
+                                    {% if customer %}
+                                        <details>
+                                            <summary class="menu-drawer__menu-item list-menu__item list-menu__item--account">
+                                                <span class="list-menu__item--inner">
+                                                    <svg
+                                                        aria-hidden="true"
+                                                        focusable="false"
+                                                        role="presentation"
+                                                        width="20"
+                                                        height="20"
+                                                        class="icon-user"
+                                                    >
+                                                        <use href="#icon-user" />
+                                                    </svg>
+                                                    <span class="account-label">
+                                                        {{- customer.first_name }}
+                                                        {{ customer.last_name -}}
+                                                    </span>
+                                                </span>
+                                                <svg
+                                                    aria-hidden="true"
+                                                    focusable="false"
+                                                    role="presentation"
+                                                    class="icon icon-caret"
+                                                >
+                                                    <use href="#icon-caret" />
+                                                </svg>
+                                            </summary>
+                                            <div
+                                                id="link-{{ link.title | escape }}"
+                                                class="menu-drawer__submenu motion-reduce"
+                                                tabindex="-1"
+                                            >
+                                                <div class="menu-drawer__inner-submenu">
+                                                    <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
+                                                        <li>
+                                                            <a
+                                                                href="{{ routes.account_url }}"
+                                                                class="menu-drawer__menu-item list-menu__item focus-inset{% if false %} menu-drawer__menu-item--active{% endif %}"
+                                                                {% if false %}
+                                                                    aria-current="page"
+                                                                {% endif %}
+                                                            >
+                                                                {{ 'customer.account_fallback' | t }}
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a
+                                                                href="{{ routes.account_logout_url }}"
+                                                                class="menu-drawer__menu-item list-menu__item focus-inset{% if false %} menu-drawer__menu-item--active{% endif %}"
+                                                                {% if false %}
+                                                                    aria-current="page"
+                                                                {% endif %}
+                                                            >
+                                                                {{ 'customer.log_out' | t }}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </details>
+                                    {% else %}
+                                        <a
+                                            href="{{ routes.account_login_url }}"
+                                            class="menu-drawer__menu-item list-menu__item list-menu__item--account"
+                                            title="{{ 'customer.log_in' | t }}"
+                                        >
+                                            <svg
+                                                aria-hidden="true"
+                                                focusable="false"
+                                                role="presentation"
+                                                width="20"
+                                                height="20"
+                                                class="icon-user"
+                                            >
+                                                <use href="#icon-user" />
+                                            </svg>
+                                            <span>{{ 'customer.log_in' | t }}</span>
+                                        </a>
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+
+                {% if show_switcher_language %}
+                    {% comment %}
+                        {% render 'switcher-language'
+                          form_id: 'DrawerLanguageForm' %}
+                        header-drawer.js inserts langiage switcher
+                    {% endcomment %}
+                    <div class="localization-language-wrapper"></div>
+                {% endif %}
+
+                {% if show_switcher_currency %}
+                    {% render 'switcher-currency', form_id: 'DrawerCurrencyForm' %}
+                {% endif %}
+
+                {% if show_switcher_country %}
+                    {% comment %}
+                        {% render 'switcher-country'
+                          form_id: 'DrawerCountryForm' %}
+                        header-drawer.js inserts currency switcher
+                    {% endcomment %}
+                    <div class="localization-currency-wrapper"></div>
+                {% endif %}
+
+                <div class="menu-drawer__navigation-footer">
+                    {%- if settings.contact_phone != blank -%}
+                        <a
+                            href="phoneto:{{ settings.contact_phone }}"
+                            title="{{ 'header_top.contact_phone.title' | t }}"
+                        >
+                            {% render 'icons-solid', name: 'phone' %}
+                            {{ settings.contact_phone }}
+                        </a>
+                    {%- endif -%}
+                    {%- if settings.contact_email != blank -%}
+                        <a
+                            href="mailto:{{ settings.contact_email }}"
+                            title="{{ 'header_top.contact_email.title' | t }}"
+                        >
+                            {% render 'icons-solid', name: 'mail' %}
+                            {{ settings.contact_email }}
+                        </a>
+                    {%- endif -%}
+                </div>
+            </div>
+        </div>
+    </details>
+</header-drawer>

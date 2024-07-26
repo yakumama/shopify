@@ -1,0 +1,127 @@
+{% liquid
+    assign sectionId = section.id | prepend: '#shopify-section-'
+%}
+<style>
+    {{ sectionId }} {
+        display: block;
+        background: {{ section.settings.color_background }};
+        color: {{ section.settings.color_text }};
+        font-size: .875rem;
+        font-weight: 500;
+        line-height: 1.25rem;
+        position: relative;
+        z-index: 30;{% if section.settings.add_border_bottom %}
+        box-shadow: inset 0px -1px 0px 0px rgba({{ section.settings.color_text.red }}, {{ section.settings.color_text.green }}, {{ section.settings.color_text.blue }}, .3);{% endif %}
+    }
+
+    #header-top-inner {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        justify-content: center;
+        padding-top: .5rem;
+        padding-bottom: .5rem;
+    }
+
+    #header-top-inner .contacts {
+        white-space: nowrap;
+    }
+
+    #header-top-inner .contacts a + a {
+        padding-left: 1rem;
+    }
+
+    #header-top-inner .contacts + p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    @media all and (min-width: 640px) {
+        #header-top-inner {
+            flex-wrap: nowrap;
+            gap: 2rem;
+            justify-content: space-between;
+        }
+    }
+</style>
+
+<div
+    id="header-top-inner"
+    class="{% if section.settings.full_width %}full--width{% else %}dynamic-page-width{% endif %}"
+>
+    {% if section.settings.show_phone or section.settings.show_email -%}
+        <p class="contacts">
+            {%- if section.settings.show_email -%}
+                <a href="mailto:{{ settings.contact_email }}" title="{{ 'header_top.contact_email.title' | t }}">
+                    {{- settings.contact_email -}}
+                </a>
+            {%- endif -%}
+            {%- if section.settings.show_phone -%}
+                <a href="phoneto:{{ settings.contact_phone }}" title="{{ 'header_top.contact_phone.title' | t }}">
+                    {{- settings.contact_phone -}}
+                </a>
+            {%- endif -%}
+        </p>
+    {%- endif %}
+    {{- section.settings.message -}}
+</div>
+
+{% schema %}
+{
+    "name": "t:sections.header_top.name",
+    "class": "header-top",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "full_width",
+            "default": false,
+            "label": "t:sections.header_top.settings.full_width.label"
+        },
+        {
+            "type": "color",
+            "id": "color_text",
+            "label": "t:sections.header_top.settings.color_text.label",
+            "default": "#7A8FA3"
+        },
+        {
+            "type": "color_background",
+            "id": "color_background",
+            "label": "t:sections.header_top.settings.color_background.label",
+            "default": "linear-gradient(180deg, rgba(247,249,251, 1), rgba(247,249,251, 1) 100%)"
+        },
+        {
+            "type": "checkbox",
+            "id": "show_email",
+            "label": "t:sections.header_top.settings.show_email.label",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_phone",
+            "label": "t:sections.header_top.settings.show_phone.label",
+            "default": false
+        },
+        {
+            "type": "richtext",
+            "id": "message",
+            "label": "t:sections.header_top.settings.message.label",
+            "default": "<p><strong>Free shipping</strong> on all orders over $50 • Hassle <strong>Free 90-day Returns</strong></p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "add_border_bottom",
+          "default": false,
+          "label": "t:sections.header_top.settings.add_border_bottom.label"
+        }
+    ],
+    "presets": [
+        {
+          "name": "t:sections.header_top.presets.name"
+        }
+    ],
+    "enabled_on": {
+        "groups": ["header"]
+    }
+}
+{% endschema %}

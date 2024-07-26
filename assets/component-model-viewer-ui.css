@@ -1,0 +1,45 @@
+.shopify-model-viewer-ui .shopify-model-viewer-ui__controls-area {
+  background: var(--color-background);
+  border-color: var(--color-foreground-4);
+}
+
+.shopify-model-viewer-ui .shopify-model-viewer-ui__button {
+  min-width: 0px;
+}
+
+.shopify-model-viewer-ui .shopify-model-viewer-ui__button--control:not(:last-child):after {
+  border-color: var(--color-foreground-4);
+}
+
+.shopify-model-viewer-ui .shopify-model-viewer-ui__button--poster {
+  background-color: var(--color-foreground-20);
+  border-radius: 8px;
+  color: var(--color-background);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  --tw-translate-x: -50%;
+  --tw-translate-y: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.shopify-model-viewer-ui .shopify-model-viewer-ui__poster-control-icon {
+  background-color: var(--color-foreground-20);
+  border-radius: 8px;
+  height: 4rem;
+  padding: .5rem;
+  width: 4rem;
+}
+
+.shopify-model-viewer-ui .shopify-model-viewer-ui__button--poster:hover,
+.shopify-model-viewer-ui .shopify-model-viewer-ui__button--poster:focus {
+  box-shadow: 0 0 2px 1px var(--color-foreground-30);
+  color: var(--color-background);
+  --tw-scale-x: 1.1;
+  --tw-scale-y: 1.1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+

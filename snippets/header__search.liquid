@@ -1,0 +1,126 @@
+{%- liquid
+    assign search_types = 'product'
+    assign possible_types = 'collection,article,page' | split: ','
+    for type in possible_types
+        assign key = 'predictive_search_show_' | append: type | append: 's'
+        if settings[key]
+            assign search_types = search_types | append: ',' | append: type
+        endif
+    endfor
+-%}
+<style>
+    .search__button {
+        --color-button-border: var(--header--text-color);
+        --color-button-background: var(--header--text-color);
+        --color-button-text: var(--header--background-color);
+        min-width: auto;
+    }
+
+    .search__button svg {
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+
+    .search__input {
+        background-color: var(--search--input--background-color);
+        color: var(--search--input--text-color);
+        /* override Safari rouded corners on input field */
+        -webkit-appearance: none;
+        -webkit-border-radius: 4px 0 0 4px;
+    }
+
+    .header__search,
+    .header__search form {
+        z-index: 31;
+        width: 100%;
+    }
+
+    .header__search form .field {
+        margin: 0;
+    }
+
+    .header__search .search__label svg {
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+
+    .header__search .search__button {
+        border: 0;
+        padding: calc(.75rem - 1px);
+        margin: 0;
+    }
+
+    /* Separate selector for search field in header becuase search field can appear at search result page */
+    .header__search .search__input {
+        border: 0;;{% if section.settings.add_border_searchfield %}
+        box-shadow: inset 0 0 0 1px var(--search--input--border);{% endif %}
+    }
+
+    @media all and (min-width: 990px) {
+        .header__search {
+            min-width: 16rem;
+        }
+    }
+</style>
+
+<div class="header__search">
+    {%- if settings.predictive_search_enabled -%}
+        <predictive-search
+            data-loading-text="{{ 'accessibility.loading' | t }}"
+            data-types="{{ search_types }}"
+            data-min-query-length="{{ settings.predictive_search_min_query_length }}"
+        >
+    {%- endif -%}
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search">
+        <label class="search__label field__label visually-hidden" for="Search-In-Modal">
+            <svg aria-hidden="true" focusable="false" role="presentation">
+                <use href="#icon-search" />
+            </svg>
+            <span>{{ 'general.search.search' | t }}</span>
+        </label>
+        <div class="field">
+            <input
+                class="search__input field__input"
+                id="Search-In-Modal"
+                type="search"
+                name="q"
+                value="{{ search.terms | escape }}"
+                placeholder="{{ 'general.search.search' | t }}"
+                {%- if settings.predictive_search_enabled -%}
+                    role="combobox"
+                    aria-expanded="false"
+                    aria-owns="predictive-search-results-list"
+                    aria-controls="predictive-search-results-list"
+                    aria-haspopup="listbox"
+                    aria-autocomplete="list"
+                    autocorrect="off"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                {%- endif -%}
+            >
+            <input name="type" type="hidden" value="product">
+            <input name="options[prefix]" type="hidden" value="last">
+            {%- if settings.predictive_search_enabled -%}
+                <div
+                    class="predictive-search predictive-search--search-template loader-when-empty"
+                    data-predictive-search
+                ></div>
+                <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+            {%- endif -%}
+
+            <button
+                class="search__button field__button"
+                aria-label="{{ 'general.search.search' | t }}"
+                onclick="let f = this.form; if (f && !f.q?.value) { f.q?.focus?.(); return false;}"
+            >
+                <svg aria-hidden="true" focusable="false" role="presentation">
+                    <use href="#icon-search" />
+                </svg>
+            </button>
+        </div>
+    </form>
+    {%- if settings.predictive_search_enabled -%}
+        </predictive-search>
+    {%- endif -%}
+</div>

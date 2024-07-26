@@ -1,0 +1,14 @@
+{% comment -%}
+    Render icon for newsletter section using block object.
+
+    Accepts:
+     - block  {Object}
+{% endcomment -%}
+
+<div
+    id="media-{{ block.id }}"
+    class="newsletter__icon"
+    {{ block.shopify_attributes }}
+>
+    {% render 'theme-icons', name: block.settings.icon %}
+</div>

@@ -1,0 +1,285 @@
+{% comment %}
+    Render product media gallery block based on block settings
+
+    Accepts:
+     - block:      {Object}
+     - blockOrder: {Number}
+     - sectionId:  {String}
+     - product:    {Object}
+{% endcomment %}
+
+{%- liquid
+    assign showThumbs = false
+    if product.media.size > 1
+        assign showThumbs = true
+    endif
+
+    capture imageSizes
+        render 'product__main-image--sizes'
+    endcapture
+
+    assign imageSizes = imageSizes | split: '|'
+    for value in imageSizes
+        case forloop.index
+            when 1
+                assign imageWidth = value | plus: 0
+            when 2
+                assign imageWidthOptions = value | strip
+            when 3
+                assign imageSizesAttribute = value | strip
+        endcase
+    endfor
+
+    assign modal_id = 'product-modal'
+    if section.settings.product != null
+        assign modal_id = modal_id | append: '-' | append: section.id
+    endif
+
+    assign thumb_images_startegy = 'always_visible'
+    if block.settings.is_thumbnail_mobile_bullet
+        assign thumb_images_startegy = 'desktop_visible'
+    endif
+-%}
+
+{%- comment -%}
+    Featured product section also uses this block.
+    Possible can be a situation when multuple produict modals will have the same ID.
+    Code below prevents it. Main product section doesn't have option 'product'.
+    And featured product section has it.
+{%- endcomment -%}
+
+{%- liquid
+    if section.settings.product != null
+        assign modal_id = modal_id | append: '-' | append: section.id
+    endif
+-%}
+<div
+    class="product__info-block product__info-block--gallery"
+    style="order: {{ blockOrder }}"
+    {{ block.shopify_attributes }}
+>
+    {%- if product.media.size > 0 -%}
+        {% render 'product__info-block--gallery--styles',
+            product: product,
+            section_id: sectionId,
+            thumb_width: block.settings.thumbnail_size,
+            thumb_images_startegy: thumb_images_startegy,
+            with_thumbs: showThumbs
+        %}
+
+        {% render 'product__info-block--gallery--symbols', product: product %}
+
+        <slider-component
+            id="gallery-{{ sectionId }}"
+            class="slideshow product__media slideshow__thumbs-vertical"
+            data-slides-per-view="1"
+        >
+            {% render 'product__info-block--gallery--thumbs',
+                product: product,
+                thumb_width: block.settings.thumbnail_size,
+                thumb_images_startegy: thumb_images_startegy
+            %}
+
+            <div class="slider-component__inner">
+                {% if block.settings.show_badges %}
+                    <div id="gallery-{{ sectionId }}-badges" data-updatable="true">
+                        {%- render 'badge-onsale', product: product.selected_or_first_available_variant, size: 'xl' -%}
+                        {%- render 'badge-soldout', product: product.selected_or_first_available_variant, size: 'xl' -%}
+                    </div>
+                {% endif %}
+                <ul class="slider slider--desktop" id="Slider-{{ sectionId }}" role="list">
+                    {%- for media in product.media -%}
+                        {%- liquid
+                            assign loading_strategy = 'lazy'
+                            if forloop.first
+                                assign loading_strategy = 'auto'
+                            endif
+                            if padding_bottom == null and media.preview_image.aspect_ratio != null
+                                assign padding_bottom = 100 | divided_by: media.preview_image.aspect_ratio
+                            endif
+                        -%}
+
+                        <li id="media-{{ media.id }}" class="slider__slide" data-media-id="{{ media.id }}">
+                            {% case media.media_type %}
+                                {% when 'model' %}
+                                    <product-model class="deferred-media media" data-id="{{ forloop.index }}">
+                                        {% render 'slide',
+                                            padding_bottom: padding_bottom,
+                                            image: media.preview_image,
+                                            section_id: sectionId,
+                                            loading_strategy: loading_strategy,
+                                            image_width: imageWidth,
+                                            width_breaks: imageWidthOptions,
+                                            sizes_attr: imageSizesAttribute,
+                                            is_preload: forloop.first
+                                        %}
+                                        <button
+                                            id="Deferred-Poster-Gallery-{{ media.id }}"
+                                            class="deferred-media__poster-button button--small button--tertiary"
+                                            type="button"
+                                            title="{{ 'products.product.media.play_model' | t }}"
+                                            tabindex="-1"
+                                        >
+                                            <span class="deferred-media__poster-button motion-reduce">
+                                                <svg aria-hidden="true" focusable="false" role="presentation">
+                                                    <use href="#icon-product-model" />
+                                                </svg>
+                                            </span>
+                                        </button>
+                                        <template>
+                                            {{ media | media_tag: image_size: '2048x', toggleable: true }}
+                                        </template>
+                                    </product-model>
+                                    <button
+                                        class="button product__xr-button button--tertiary"
+                                        type="button"
+                                        aria-label="{{ 'products.product.xr_button_label' | t }}"
+                                        data-shopify-xr
+                                        data-shopify-model3d-id="{{ media.id }}"
+                                        data-shopify-title="title"
+                                        data-shopify-xr-hidden
+                                    >
+                                        {% comment %}{% render 'icon-3d-model' %}{% endcomment %}
+                                        {{ 'products.product.xr_button' | t }}
+                                    </button>
+                                {% when 'external_video' %}
+                                    <deferred-media class="deferred-media media" data-media-id="{{ media.id }}">
+                                        {% render 'slide',
+                                            padding_bottom: padding_bottom,
+                                            image: media.preview_image,
+                                            section_id: sectionId,
+                                            loading_strategy: loading_strategy,
+                                            image_width: imageWidth,
+                                            width_breaks: imageWidthOptions,
+                                            sizes_attr: imageSizesAttribute,
+                                            is_preload: forloop.first
+                                        %}
+                                        <button
+                                            id="Deferred-Poster-Gallery-{{ media.id }}"
+                                            class="deferred-media__poster-button button--small button--tertiary"
+                                            type="button"
+                                            title="{{ 'products.product.media.play_video' | t }}"
+                                            tabindex="-1"
+                                        >
+                                            <span class="deferred-media__poster-button motion-reduce">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="ionicon"
+                                                    viewBox="0 0 512 512"
+                                                >
+                                                    <path d="M112 111v290c0 17.44 17 28.52 31 20.16l247.9-148.37c12.12-7.25 12.12-26.33 0-33.58L143 90.84c-14-8.36-31 2.72-31 20.16z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                                </svg>
+                                            </span>
+                                        </button>
+                                        {% render 'media__deferred-template', media: media %}
+                                    </deferred-media>
+
+                                {% when 'video' %}
+                                    <deferred-media class="deferred-media media" data-media-id="{{ media.id }}">
+                                        {% render 'slide',
+                                            padding_bottom: padding_bottom,
+                                            image: media.preview_image,
+                                            section_id: sectionId,
+                                            loading_strategy: loading_strategy,
+                                            image_width: imageWidth,
+                                            width_breaks: imageWidthOptions,
+                                            sizes_attr: imageSizesAttribute,
+                                            is_preload: forloop.first
+                                        %}
+                                        <button
+                                            id="Deferred-Poster-Modal-{{ media.id }}"
+                                            class="deferred-media__poster-button button--small button--tertiary"
+                                            type="button"
+                                            title="{{ 'products.product.media.play_video' | t }}"
+                                            tabindex="-1"
+                                        >
+                                            <span class="deferred-media__poster-button motion-reduce">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="ionicon"
+                                                    viewBox="0 0 512 512"
+                                                >
+                                                    <path d="M112 111v290c0 17.44 17 28.52 31 20.16l247.9-148.37c12.12-7.25 12.12-26.33 0-33.58L143 90.84c-14-8.36-31 2.72-31 20.16z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                                                </svg>
+                                            </span>
+                                        </button>
+                                        {% render 'media__deferred-template', media: media %}
+                                    </deferred-media>
+                                {% else %}
+                                    <modal-opener data-modal="#{{ modal_id }}" data-media-id="{{ media.id }}">
+                                        {% render 'slide',
+                                            padding_bottom: padding_bottom,
+                                            image: media.preview_image,
+                                            section_id: sectionId,
+                                            loading_strategy: loading_strategy,
+                                            image_width: imageWidth,
+                                            width_breaks: imageWidthOptions,
+                                            sizes_attr: imageSizesAttribute,
+                                            is_preload: forloop.first
+                                        %}
+                                        <button
+                                            aria-haspopup="dialog"
+                                            data-media-id="{{ media.id }}"
+                                            tabindex="-1"
+                                        >
+                                            <span class="visually-hidden">
+                                                {%- if media.position == 'featured' %}
+                                                    {{ 'products.product.media.open_featured_media' | t }}
+                                                {%- else -%}
+                                                    {{ 'products.product.media.open_media' | t: index: media.position }}
+                                                {%- endif -%}
+                                            </span>
+                                        </button>
+                                    </modal-opener>
+                            {% endcase %}
+                        </li>
+                    {%- endfor -%}
+                </ul>
+
+                {% if product.media.size > 1 and block.settings.show_controls %}
+                    <div class="slider-buttons no-js-hidden">
+                        <button
+                            type="button"
+                            class="slider-button slider-button--prev button--tertiary slider-button--stucked"
+                            name="previous"
+                            aria-label="{{ 'accessibility.previous_slide' | t }}"
+                        >
+                            {% render 'icons-theme', name: 'arrow-left', css_class: 'icon' %}
+                        </button>
+                        <button
+                            type="button"
+                            class="slider-button slider-button--next button--tertiary slider-button--stucked"
+                            name="next"
+                            aria-label="{{ 'accessibility.next_slide' | t }}"
+                        >
+                            {% render 'icons-theme', name: 'arrow-right', css_class: 'icon' %}
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </slider-component>
+    {%- endif -%}
+</div>
+
+{% comment -%}
+    Fix incorrect active image in gallery when variant speciafied initially
+{% endcomment -%}
+{% if product.selected_variant.featured_media.id != null %}
+    <script>
+        (async () => {
+            const component = document.getElementById('gallery-{{ sectionId }}');
+            const slide = component?.querySelector?.('#media-{{ product.selected_variant.featured_media.id }}');
+
+            if (slide && slide.offsetLeft) {
+                component.style.visibility = 'hidden';
+                await customElements.whenDefined('slider-component');
+                component.slider.style.scrollBehavior = 'auto';
+                component.slider.scrollLeft = slide.offsetLeft;
+                component.slider.style.scrollBehavior = '';
+                component.style.visibility = '';
+            }
+        })();
+    </script>
+{% endif %}
+
+{% render 'product-modal', modal_id: modal_id, product: product, thumb_width: block.settings.thumbnail_size %}

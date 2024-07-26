@@ -1,0 +1,55 @@
+{% comment %}
+    Render Product List
+
+    Accepts:
+    - products:             {Object}
+    - limit:                {Number}
+    - image_ratio:          {String}
+    - show_slider_buttons:  {Bool}
+    - ul_id:                {String}
+    - ul_class:             {String}
+{% endcomment %}
+
+<div class="collection-inner">
+    {%- if show_slider_buttons -%}<slider-component>{% endif %}
+    {% liquid
+        if show_slider_buttons
+            assign ul_class = ul_class | append: ' slider--desktop slider grid--peek'
+        endif
+    %}
+    {% render 'grid-items',
+        ul_id: ul_id,
+        ul_class: ul_class,
+        has_side_column: false,
+        items: products,
+        limit: limit,
+        badge_size: false,
+        image_ratio: image_ratio,
+        product_secondary_image: false,
+        product_to_cart_button: false,
+        product_show_vendor: false,
+        row_divider: false
+    %}
+
+    {%- if show_slider_buttons -%}
+        <div class="slider-buttons no-js-hidden">
+            <button
+                type="button"
+                class="slider__button slider-button--stucked slider-button--prev button--tertiary"
+                name="previous"
+                aria-label="{{ 'accessibility.previous_slide' | t }}"
+            >
+                {% render 'icons-theme', name: 'arrow-left', css_class: 'icon' %}
+            </button>
+            <button
+                type="button"
+                class="slider__button  slider-button--stucked slider-button--next button--tertiary"
+                name="next"
+                aria-label="{{ 'accessibility.next_slide' | t }}"
+            >
+                {% render 'icons-theme', name: 'arrow-right', css_class: 'icon' %}
+            </button>
+        </div>
+    {% endif %}
+    {%- if show_slider_buttons -%}</slider-component>{% endif %}
+</div>

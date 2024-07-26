@@ -1,0 +1,727 @@
+{%- assign sectionId = section.id | prepend: '#shopify-section-' -%}
+
+{% render 'header__styles' %}
+
+<link rel="stylesheet" href="{{ 'disclosure.css' | asset_url }}" media="print" onload="this.media='all'">
+
+<noscript>
+    {{ 'section-navigation-megamenu.css' | asset_url | stylesheet_tag }}
+    {{ 'section-navigation-smallmenu.css' | asset_url | stylesheet_tag }}
+    {{ 'component-menu-drawer.css' | asset_url | stylesheet_tag }}
+</noscript>
+
+{% capture header_html -%}
+  <header class="header
+    {% if section.settings.full_width %}full--width{% else %}dynamic-page-width{% endif %}
+    {% if section.settings.menu != blank %} header--has-menu{% else%} header--with-no-menu{% endif %}"
+  >
+    {% # Render Drawer menu and Render Main menu in Slideout styles %}
+    {%- unless section.settings.menu == blank -%}
+      {% render 'header__drawer'
+        menu: section.settings.menu
+        show_switcher_language: section.settings.show_switcher_language
+        show_switcher_currency: section.settings.show_switcher_currency
+        show_switcher_country: section.settings.show_switcher_country
+      %}
+    {%- endunless -%}
+
+    {% # Render Logo %}
+    {% render 'header__heading'
+      logo: section.settings.logo
+      logo_width: section.settings.logo_width
+    %}
+
+    {% # Render Main menu in row styles %}
+    {%- if section.settings.menu != blank and section.settings.use_slideout_menu == false -%}
+      {% style %}
+  .full-width .container--grid .col-items .list-menu--disclosure.row-2 {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.main_items_per_row }}, 1fr);
+    gap: .5rem 1rem;
+  }
+{% endstyle %}
+{% liquid
+  assign megaMenuList = section.settings.megamenu_items | escape | downcase | split: "," | strip
+  assign smallMenuList = section.settings.smallmenu_items | escape | downcase | split: "," | strip
+%}
+<header-menu>
+  <nav class="header__inline-menu">
+    <ul class="list-menu list-menu--inline" role="list" data-activate-menu="{{ section.settings.activate_top_level_menu }}">
+      {%- for link in section.settings.menu.links -%}
+      {%- assign indexItemMenu = forloop.index -%}
+      {%- assign linkTitle = link.title | escape | downcase -%}
+{% # Render dropdown Megamenu of selected top menu  %}
+        {%- if megaMenuList contains linkTitle -%}
+          {%- assign typeDropdownMenu = 'full-width' -%}
+          <li data-items-menu
+            item-index="{{ indexItemMenu }}"
+            class="{% if link.current %}list-menu__item--active{% endif %} {{ typeDropdownMenu }}"
+          >
+
+            <details-disclosure>
+  <details>
+    <summary class="header__menu-item header__menu-item-top header__menu-item-{{ forloop.index }} {% if link.child_active %}header__active-menu-item{% endif %} {{ typeDropdownMenu }} list-menu__item focus-inset">
+      <a href="{{ link.url }}" class="menu-item-top list-menu__item focus-inset{% if link.current %} list-menu__item--active{% endif %}"{% if link.current %} aria-current="page"{% endif %}>
+        <span>{{ link.title | escape }}</span>
+      </a>
+      <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><use href="#icon-caret" /></svg>
+    </summary>
+    <div class="dropdown-inner {{ typeDropdownMenu }}">
+      {%- assign itemsSize = link.links.size -%}
+
+{% # render extra attribute to remove dropdown menu links if config option is checked using js code %}
+      {%- unless section.blocks.size == 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if indexItemMenu == block.settings.item_menu_index and block.settings.disable_menu_links -%}
+            <span class="remove-menu" data-item-image-index="{{ block.settings.item_menu_index }}" hidden></span>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endunless -%}
+{% # end render extra attribute to remove dropdown menu links if config option is checked using js code %}
+
+      <div class="container--grid {% if section.settings.full_width %}full--width{% else %}dynamic-page-width{% endif %}">
+        <div class="col-items" data-item-index="{{ indexItemMenu }}">
+          {%- if link.links != blank -%}
+          <ul class="header__submenu list-menu list-menu--disclosure motion-reduce {% if itemsSize > 4 %}row-2{% endif %}" role="list" tabindex="-1" data-links-size="{{ itemsSize }}">
+            {%- for childlink in link.links -%}
+<li>
+  <details>
+    <summary class="header__menu-item menu-childitem link--text list-menu__item {% if childlink.child_active %}list-menu__item--active{% endif %} focus-inset">
+      <a href="{{ childlink.url }}" class="header__menu-item list-menu__item link--text focus-inset{% if childlink.current %} list-menu__item--active{% endif %}"{% if childlink.current %} aria-current="page"{% endif %}>
+        {%- if section.settings.show_collection_image -%}
+          {% render 'header__menu--collection-icon'
+            link: childlink
+          %}
+        {%- endif -%}
+        <span>{{ childlink.title | escape }}</span>
+        {%- if childlink.links != blank -%}<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><use href="#icon-caret" /></svg>{%- endif -%}
+      </a>
+    </summary>
+    {%- if childlink.links != blank -%}
+      <ul class="childlist-menu--disclosure list-menu motion-reduce" data-type-menu="{{ typeDropdownMenu }}">
+      {%- if section.settings.second_dropdown_limit_qty_categories == 0 -%}
+      {%- for grandchildlink in childlink.links -%}
+        <li>
+          <a href="{{ grandchildlink.url }}" class="header__menu-item list-menu__item link--text focus-inset{% if grandchildlink.current %} list-menu__item--active{% endif %}"{% if grandchildlink.current %} aria-current="page"{% endif %}>
+            {{ grandchildlink.title | escape }}
+          </a>
+        </li>
+      {%- endfor -%}
+      {%- else -%}
+      {%- for grandchildlink in childlink.links limit: section.settings.second_dropdown_limit_qty_categories -%}
+        <li>
+          <a href="{{ grandchildlink.url }}" class="header__menu-item list-menu__item link--text focus-inset{% if grandchildlink.current %} list-menu__item--active{% endif %}"{% if grandchildlink.current %} aria-current="page"{% endif %}>
+            {{ grandchildlink.title | escape }}
+          </a>
+        </li>
+      {%- endfor -%}
+      {%- if childlink.links.size > section.settings.second_dropdown_limit_qty_categories -%}
+        <li>
+          <a href="{{ childlink.url }}" class="header__menu-item list-menu__item link--text focus-inset link_shop-all">
+            <span>{{ section.settings.second_dropdown_limit_qty_categories_link | escape }}</span>
+          </a>
+        </li>
+      {%- endif -%}
+      {%- endif -%}
+      </ul>
+    {%- endif-%}
+  </details>
+</li>
+{%- endfor -%}
+          </ul>
+          {%- endif -%}
+
+          {%- if section.blocks.size > 0 -%}
+{%- for block in section.blocks -%}
+  {% case block.type %}
+    {%- when 'banner_image' -%}
+    {% render 'header__dropdown--banner_image'
+        block: block
+        blockOrder: forloop.index
+        parent_item_index: indexItemMenu
+    %}{%- when 'list_collection_items' -%}
+    {% render 'header__dropdown--list_collection_items'
+        block: block
+        blockOrder: forloop.index
+        parent_item_index: indexItemMenu
+    %}{%- when 'list_product_items' -%}
+    {% render 'header__dropdown--list_product_items'
+        block: block
+        blockOrder: forloop.index
+        parent_item_index: indexItemMenu
+    %}
+  {% endcase %}
+{%- endfor -%}
+{%- endif -%}
+
+        </div>
+      </div>
+    </div>
+  </details>
+</details-disclosure>
+          </li>
+
+{% # Render dropdown small menu of selected top menu  %}
+        {%- elsif smallMenuList contains linkTitle -%}
+          {%- assign typeDropdownMenu = 'small' -%}
+          <li data-items-menu
+            item-index="{{ indexItemMenu }}"
+            class="{% if link.current %}list-menu__item--active{% endif %} {{ typeDropdownMenu }}"
+          >
+            {% render 'header__menu--item'
+              link: link,
+              index: forloop.index
+            %}
+          </li>
+
+        {%- else -%}
+          {%- assign typeDropdownMenu = section.settings.second_level_menu_width -%}
+          <li data-items-menu item-index="{{ indexItemMenu }}" class="{% if link.current %}list-menu__item--active{% endif %}">
+
+          {%- if typeDropdownMenu == 'full-width' -%}
+            {% if link.links != blank  %}
+            <details-disclosure>
+  <details>
+    <summary class="header__menu-item header__menu-item-top header__menu-item-{{ forloop.index }} {% if link.child_active %}header__active-menu-item{% endif %} {{ typeDropdownMenu }} list-menu__item focus-inset">
+      <a href="{{ link.url }}" class="menu-item-top list-menu__item focus-inset{% if link.current %} list-menu__item--active{% endif %}"{% if link.current %} aria-current="page"{% endif %}>
+        <span>{{ link.title | escape }}</span>
+      </a>
+      <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><use href="#icon-caret" /></svg>
+    </summary>
+    <div class="dropdown-inner {{ typeDropdownMenu }}">
+      {%- assign itemsSize = link.links.size -%}
+
+{% # render extra attribute to remove dropdown menu links if config option is checked using js code %}
+      {%- unless section.blocks.size == 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if indexItemMenu == block.settings.item_menu_index and block.settings.disable_menu_links -%}
+            <span class="remove-menu" data-item-image-index="{{ block.settings.item_menu_index }}" hidden></span>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endunless -%}
+{% # end render extra attribute to remove dropdown menu links if config option is checked using js code %}
+
+      <div class="container--grid {% if section.settings.full_width %}full--width{% else %}dynamic-page-width{% endif %}">
+        <div class="col-items" data-item-index="{{ indexItemMenu }}">
+          {%- if link.links != blank -%}
+          <ul class="header__submenu list-menu list-menu--disclosure motion-reduce {% if itemsSize > 4 %}row-2{% endif %}" role="list" tabindex="-1" data-links-size="{{ itemsSize }}">
+            {%- for childlink in link.links -%}
+<li>
+  <details>
+    <summary class="header__menu-item menu-childitem link--text list-menu__item {% if childlink.child_active %}list-menu__item--active{% endif %} focus-inset">
+      <a href="{{ childlink.url }}" class="header__menu-item list-menu__item link--text focus-inset{% if childlink.current %} list-menu__item--active{% endif %}"{% if childlink.current %} aria-current="page"{% endif %}>
+        {%- if section.settings.show_collection_image -%}
+          {% render 'header__menu--collection-icon'
+            link: childlink
+          %}
+        {%- endif -%}
+        <span>{{ childlink.title | escape }}</span>
+        {%- if childlink.links != blank -%}<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-caret"><use href="#icon-caret" /></svg>{%- endif -%}
+      </a>
+    </summary>
+    {%- if childlink.links != blank -%}
+      <ul class="childlist-menu--disclosure list-menu motion-reduce" data-type-menu="{{ typeDropdownMenu }}">
+      {%- if section.settings.second_dropdown_limit_qty_categories == 0 -%}
+      {%- for grandchildlink in childlink.links -%}
+        <li>
+          <a href="{{ grandchildlink.url }}" class="header__menu-item list-menu__item link--text focus-inset{% if grandchildlink.current %} list-menu__item--active{% endif %}"{% if grandchildlink.current %} aria-current="page"{% endif %}>
+            {{ grandchildlink.title | escape }}
+          </a>
+        </li>
+      {%- endfor -%}
+      {%- else -%}
+      {%- for grandchildlink in childlink.links limit: section.settings.second_dropdown_limit_qty_categories -%}
+        <li>
+          <a href="{{ grandchildlink.url }}" class="header__menu-item list-menu__item link--text focus-inset{% if grandchildlink.current %} list-menu__item--active{% endif %}"{% if grandchildlink.current %} aria-current="page"{% endif %}>
+            {{ grandchildlink.title | escape }}
+          </a>
+        </li>
+      {%- endfor -%}
+      {%- if childlink.links.size > section.settings.second_dropdown_limit_qty_categories -%}
+        <li>
+          <a href="{{ childlink.url }}" class="header__menu-item list-menu__item link--text focus-inset link_shop-all">
+            <span>{{ section.settings.second_dropdown_limit_qty_categories_link | escape }}</span>
+          </a>
+        </li>
+      {%- endif -%}
+      {%- endif -%}
+      </ul>
+    {%- endif-%}
+  </details>
+</li>
+{%- endfor -%}
+          </ul>
+          {%- endif -%}
+
+          {%- if section.blocks.size > 0 -%}
+{%- for block in section.blocks -%}
+  {% case block.type %}
+    {%- when 'banner_image' -%}
+    {% render 'header__dropdown--banner_image'
+        block: block
+        blockOrder: forloop.index
+        parent_item_index: indexItemMenu
+    %}{%- when 'list_collection_items' -%}
+    {% render 'header__dropdown--list_collection_items'
+        block: block
+        blockOrder: forloop.index
+        parent_item_index: indexItemMenu
+    %}{%- when 'list_product_items' -%}
+    {% render 'header__dropdown--list_product_items'
+        block: block
+        blockOrder: forloop.index
+        parent_item_index: indexItemMenu
+    %}
+  {% endcase %}
+{%- endfor -%}
+{%- endif -%}
+
+        </div>
+      </div>
+    </div>
+  </details>
+</details-disclosure>
+            {% else %}
+            <a href="{{ link.url }}" class="header__menu-item header__menu-item-top {% if bgHighlightedItem %}header__menu-item-{{ forloop.index }}-highlighted{% else %}header__menu-item-{{ forloop.index }}{% endif %} {% if link.current %}header__active-menu-item{% endif %} list-menu__item focus-inset"{% if link.current %} aria-current="page"{% endif %}>
+              <span>{{ link.title | escape }}</span>
+            </a>
+            {% endif %}
+          {% else %}
+            {% render 'header__menu--item'
+              link: link,
+              index: forloop.index
+            %}
+          {%- endif -%}
+
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </nav>
+</header-menu>
+
+    {%- endif -%}
+
+    {% # Render Header icons %}
+    <div class="header__icons" {% if section.settings.logo == blank and shop.name.size > 30 %} data-only-icons="true"{% endif %}>
+
+      {%- render 'header__search' -%}
+
+      <div class="header__buttons--wrapper">
+
+        {%- if section.settings.show_switcher_language -%}
+          {% render 'switcher-language'
+            form_id: 'LanguageForm'
+          %}
+        {%- endif -%}
+
+        {%- if section.settings.show_switcher_currency -%}
+          {% render 'switcher-currency'
+            form_id: 'CurrencyForm'
+          %}
+        {%- endif -%}
+
+        {%- if section.settings.show_switcher_country -%}
+          {% render 'switcher-country'
+            form_id: 'CountryForm' %}
+        {%- endif -%}
+
+        {%- if shop.customer_accounts_enabled -%}
+          {% render 'header__account' %}
+        {% endif %}
+
+        <a href="{{ routes.cart_url }}"
+           class="button header__icon header__icon--cart"
+           id="cart-icon-bubble"
+           title="{{ 'templates.cart.cart' | t }}">
+          {% render 'cart-icon-bubble-inner' cart: cart %}
+        </a>
+
+        {% render 'cart-sidebar' cart_type: 'dropdown' %}
+
+      </div>
+    </div>
+  </header>
+{%- endcapture -%}
+{%- if section.settings.enable_sticky_header -%}
+    <sticky-header class="header-wrapper">
+        {{ header_html }}
+    </sticky-header>
+{%- else -%}
+    <div class="header-wrapper">
+        {{ header_html }}
+    </div>
+{%- endif %}
+<div class="header-menu__overlay-element"></div>
+
+<script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      {% if section.settings.logo %}
+        {% assign image_size = section.settings.logo.width | append: 'x' %}
+        "logo": {{ section.settings.logo | image_url: image_size | prepend: "https:" | json }},
+      {% endif %}
+      "sameAs": [
+        {{ settings.social_twitter_link | json }},
+        {{ settings.social_facebook_link | json }},
+        {{ settings.social_pinterest_link | json }},
+        {{ settings.social_instagram_link | json }},
+        {{ settings.social_tumblr_link | json }},
+        {{ settings.social_snapchat_link | json }},
+        {{ settings.social_youtube_link | json }},
+        {{ settings.social_vimeo_link | json }}
+      ],
+      "url": {{ shop.url | append: page.url | json }}
+    }
+</script>
+
+{%- if request.page_type == 'index' -%}
+    {% assign potential_action_target = shop.url | append: routes.search_url | append: '?q={search_term_string}' %}
+    <script type="application/ld+json">
+        {
+          "@context": "http://schema.org",
+          "@type": "WebSite",
+          "name": {{ shop.name | json }},
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {{ potential_action_target | json }},
+            "query-input": "required name=search_term_string"
+          },
+          "url": {{ shop.url | append: page.url | json }}
+        }
+    </script>
+{%- endif -%}
+
+{% render 'initialize-deferred-scripts',
+    init_header_drawer: true,
+    init_header_menu: true,
+    init_sticky_header: section.settings.enable_sticky_header
+%}
+
+{% schema %}
+{
+  "name": "t:sections.header.name",
+  "class": "section-header-transition",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.header.settings.full_width.label",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "t:sections.header.settings.logo.label"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 50,
+      "max": 250,
+      "step": 10,
+      "default": 100,
+      "unit": "t:sections.header.settings.logo_width.unit",
+      "label": "t:sections.header.settings.logo_width.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_header",
+      "default": true,
+      "label": "t:sections.header.settings.enable_sticky_header.label",
+      "info": "t:sections.header.settings.enable_sticky_header.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_switcher_language",
+      "label": "t:sections.header.settings.show_switcher_language.label",
+      "info": "t:sections.header.settings.show_switcher_language.info",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_switcher_country",
+      "label": "t:sections.header.settings.show_switcher_country.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "add_border_searchfield",
+      "default": true,
+      "label": "t:sections.header.settings.add_border_searchfield.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "add_border_bottom",
+      "default": false,
+      "label": "t:sections.header.settings.add_border_bottom.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_1.content"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "t:sections.header.settings.menu.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_slideout_menu",
+      "label": "t:sections.header.settings.use_slideout_menu.label",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "second_level_menu_width",
+      "options": [
+        {
+          "value": "full-width",
+          "label": "t:sections.header.settings.second_level_menu_width.options__1"
+        },
+        {
+          "value": "small",
+          "label": "t:sections.header.settings.second_level_menu_width.options__2"
+        }
+      ],
+      "default": "small",
+      "label": "t:sections.header.settings.second_level_menu_width.label"
+    },
+    {
+      "type": "text",
+      "id": "megamenu_items",
+      "label": "t:sections.header.settings.megamenu_items.label",
+      "info": "t:sections.header.settings.megamenu_items.info"
+    },
+    {
+      "type": "text",
+      "id": "smallmenu_items",
+      "label": "t:sections.header.settings.smallmenu_items.label",
+      "info": "t:sections.header.settings.smallmenu_items.info"
+    },
+    {
+      "type": "select",
+      "id": "activate_top_level_menu",
+      "options": [
+        {
+          "value": "on_hover",
+          "label": "t:sections.header.settings.activate_top_level_menu.on_hover"
+        },
+        {
+          "value": "on_click",
+          "label": "t:sections.header.settings.activate_top_level_menu.on_click"
+        }
+      ],
+      "default": "on_hover",
+      "label": "t:sections.header.settings.activate_top_level_menu.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_image",
+      "label": "t:sections.header.settings.show_collection_image.label",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_icon",
+      "label": "t:sections.header.settings.collection_icon.label",
+      "info": "t:sections.header.settings.collection_icon.info"
+    },
+    {
+      "type":"range",
+      "id": "collection_icon_width",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "default": 30,
+      "unit": "t:sections.header.settings.logo_width.unit",
+      "label": "t:sections.header.settings.collection_icon_width.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_2.content"
+    },
+    {
+      "type": "range",
+      "id": "main_items_per_row",
+      "min": 1,
+      "max":  6,
+      "step": 1,
+      "default": 4,
+      "label": "t:sections.header.settings.main_items_per_row.label"
+    },
+    {
+      "type": "text",
+      "id": "second_dropdown_limit_qty_categories_link",
+      "label": "t:sections.header.settings.second_dropdown_limit_qty_categories_link.label",
+      "default": "Shop All"
+    },
+    {
+      "type": "number",
+      "id": "second_dropdown_limit_qty_categories",
+      "label": "t:sections.header.settings.second_dropdown_limit_qty_categories.label",
+      "default": 5
+    }
+  ],
+  "max_blocks": 20,
+  "blocks": [
+    {
+      "type": "banner_image",
+      "name": "t:sections.header.blocks.banner_image.name",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "disable_menu_links",
+          "label": "t:sections.header.blocks.settings.disable_menu_links.label",
+          "info": "t:sections.header.blocks.settings.disable_menu_links.info",
+          "default": false
+        },
+        {
+          "type": "image_picker",
+          "id": "item_image",
+          "label": "t:sections.header.blocks.settings.item_image"
+        },
+        {
+          "type": "url",
+          "id": "image_link",
+          "label": "t:sections.header.blocks.settings.image_link"
+        },
+        {
+          "type": "text",
+          "id": "image_title",
+          "label": "t:sections.header.blocks.settings.image_title"
+        },
+        {
+          "type": "number",
+          "id": "item_menu_index",
+          "label": "t:sections.header.blocks.settings.item_menu_index.label",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "type": "list_collection_items",
+      "name": "t:sections.header.blocks.list_collection_items.name",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "disable_menu_links",
+          "label": "t:sections.header.blocks.settings.disable_menu_links.label",
+          "info": "t:sections.header.blocks.settings.disable_menu_links.info",
+          "default": false
+        },
+        {
+          "type": "collection_list",
+          "id": "collections",
+          "label": "t:sections.header.blocks.settings.collections"
+        },
+        {
+          "type": "url",
+          "id": "collection_url",
+          "label": "t:sections.our-list-collections.settings.collection_url.label"
+        },
+        {
+          "type":"range",
+          "id": "collection_items_width",
+          "min": 10,
+          "max": 50,
+          "step": 2,
+          "default": 20,
+          "unit": "t:sections.header.blocks.settings.collection_items_width.unit",
+          "label": "t:sections.header.blocks.settings.collection_items_width.label"
+        },
+        {
+          "type": "number",
+          "id": "item_menu_index",
+          "label": "t:sections.header.blocks.settings.item_menu_index.label",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "type": "list_product_items",
+      "name": "t:sections.header.blocks.list_product_items.name",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "disable_menu_links",
+          "label": "t:sections.header.blocks.settings.disable_menu_links.label",
+          "info": "t:sections.header.blocks.settings.disable_menu_links.info",
+          "default": false
+        },
+        {
+          "type": "collection",
+          "id": "product_list",
+          "label": "t:sections.header.blocks.settings.product_list"
+        },
+        {
+          "type": "range",
+          "id": "products_to_show",
+          "min": 2,
+          "max": 12,
+          "step": 1,
+          "default": 4,
+          "label": "t:sections.featured-collection.settings.products_to_show.label"
+        },
+        {
+          "type":"range",
+          "id": "items_width",
+          "min": 10,
+          "max": 50,
+          "step": 2,
+          "default": 20,
+          "unit": "t:sections.header.blocks.settings.items_width.unit",
+          "label": "t:sections.header.blocks.settings.items_width.label"
+        },
+        {
+          "type": "number",
+          "id": "item_menu_index",
+          "label": "t:sections.header.blocks.settings.item_menu_index.label",
+          "default": 1
+        },
+        {
+          "type": "url",
+          "id": "collection_url",
+          "label": "t:sections.our-list-collections.settings.collection_url.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_product_price",
+          "label": "t:sections.header.blocks.settings.show_product_price.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_badge",
+          "label": "t:sections.header.blocks.settings.show_badge.label",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_outline_border",
+          "label": "t:sections.header.blocks.settings.show_outline_border.label",
+          "default": true
+        }
+        // {
+        //   "type": "checkbox",
+        //   "id": "show_slider_buttons",
+        //   "label": "t:sections.featured-collection.settings.show_slider_buttons.label",
+        //   "info": "t:sections.featured-collection.settings.show_slider_buttons.info",
+        //   "default": false
+        // }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.header.presets.name"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  }
+}
+{% endschema %}

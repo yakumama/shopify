@@ -1,0 +1,80 @@
+.deferred-media__poster {
+  margin: 0px;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 0px;
+  border-width: 0px;
+  background-color: transparent;
+  padding: 0px;
+}
+
+.deferred-media__poster img {
+  margin-left: auto;
+  margin-right: auto;
+  height: 100%;
+  width: auto;
+}
+
+.deferred-media {
+  overflow: hidden;
+}
+
+.deferred-media:not([loaded]) template {
+  z-index: -1;
+}
+
+.deferred-media[loaded] > .deferred-media__poster,
+.deferred-media[loaded] > .deferred-media__poster-button {
+  display: none;
+}
+
+.deferred-media__poster:focus {
+  outline-offset: -0.3rem;
+}
+
+.deferred-media__poster-button {
+  align-items: center;
+  background-color: var(--color-foreground-20);
+  border-radius: 8px;
+  color: var(--color-background);
+  display: flex;
+  height: 3rem;
+  justify-content: center;
+  left: 50%;
+  overflow: hidden;
+  padding: 0.5rem;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  width: 3rem;
+  z-index: 10;
+}
+
+.deferred-media__poster-button svg {
+  height: 100%;
+  width: 100%;
+}
+
+@media all and (min-width: 990px) {
+  .deferred-media__poster-button {
+    height: 4rem;
+    width: 4rem;
+  }
+}
+
+.deferred-media__poster-button:hover {
+  box-shadow: 0 0 2px 1px var(--color-foreground-30);
+  opacity: .95;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.deferred-media__poster-button .icon-play {
+  margin-left: 0.25rem;
+  width: 100%;
+  fill: currentColor;
+}
+

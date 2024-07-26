@@ -1,0 +1,75 @@
+{%- comment -%}
+    Render product title using block settings
+
+    Accepts:
+     - block:      {Object}
+     - blockOrder: {Number}
+     - sectionId:  {String}
+     - product:    {Object}
+{%- endcomment -%}
+
+<div
+    class="product__info-block product__info-block--border product__info-block--title{% if block.settings.show_price %} product__info-block--title-with-price{% endif %}{% if block.settings.show_badges %} product__info-block--title-with-badge{% endif %}"
+    style="order: {{ blockOrder }}"
+    {{ block.shopify_attributes }}
+>
+    <div class="product__title--wrapper">
+        {% if block.settings.text_before != blank %}
+            <p class="product__title--before">{{ block.settings.text_before }}</p>
+        {% endif %}
+        <h1 class="product__title">
+            {{- product.title | escape | default: 'Product title' -}}
+        </h1>
+        {% if block.settings.text_after != blank %}
+            <p class="product__title--after">{{ block.settings.text_after }}</p>
+        {% endif %}
+        {%- if block.settings.show_rating_judgeme -%}
+            <a
+                href="#shopify-product-reviews"
+                class="product__title--rating"
+                title="{{ 'sections.main-product.title.reviews' | t }}"
+            >
+                <span class="jdgm-widget jdgm-preview-badge">
+                    {{- product.metafields.judgeme.badge -}}
+                </span>
+                {%- comment -%}
+                    <!-- Integration with SPR app. Can be removed. -->
+                    <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+                {%- endcomment -%}
+            </a>
+        {%- endif -%}
+        {%- if block.settings.show_sku -%}
+            <div id="block-title-sku-{{ sectionId }}" class="product__title--sku" data-updatable="true">
+                {%- if product == null -%}
+                    {%- assign sku = 'demo-sku' -%}
+                {%- else -%}
+                    {%- assign sku = product.selected_or_first_available_variant.sku -%}
+                {%- endif -%}
+                {%- unless sku == '' or sku == null -%}
+                    <span class="label">{{ 'products.product.sku' | t }}</span>
+                    <span class="value">{{ sku }}</span>
+                {%- endunless -%}
+            </div>
+        {%- endif -%}
+    </div>
+    {%- if block.settings.show_price or block.settings.show_badges -%}
+        <div id="block-title-price-{{ sectionId }}" class="product__price product__title--price" data-updatable="true">
+            {%- render 'price',
+                product: product,
+                use_variant: true,
+                show_badges: block.settings.show_badges,
+                show_stock: false,
+                show_sku: false
+            -%}
+            {%- comment -%}
+                  <div class="product__title--tax">
+                      {%- if cart.taxes_included -%}
+                        {{ 'sections.cart.taxes_included' | t }}
+                      {%- else -%}
+                        {{ 'sections.cart.taxes_excluded' | t }}
+                      {%- endif -%}
+                </div>
+            {%- endcomment -%}
+        </div>
+    {%- endif -%}
+</div>

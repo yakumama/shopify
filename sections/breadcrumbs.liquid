@@ -1,0 +1,197 @@
+{% style %}
+    {% if section.settings.border_bottom or section.settings.border_top -%}
+    #shopify-section-{{ section.id }} {
+      {% if section.settings.border_bottom -%}
+        border-bottom: 2px solid var(--color-foreground-4);
+      {%- endif %}
+      {% if section.settings.border_top -%}
+        border-top: 2px solid var(--color-foreground-4);
+      {%- endif %}
+    }
+
+    {% endif -%}
+    .breadcrumbs {
+      padding: .25rem;
+    }
+
+    .breadcrumbs .items {
+      color: var(--color-foreground-50);
+      display: flex;
+      gap: .5rem;
+      overflow: auto;
+      white-space: nowrap;
+    }
+
+    .breadcrumbs .items::-webkit-scrollbar {
+      display: block;
+      height: .25rem;
+      width: .25rem;
+      padding: 0 .25rem;
+    }
+
+    .breadcrumbs .items::-webkit-scrollbar-thumb {
+      background-color: var(--color-foreground-20);
+      border-width: 0px;
+    }
+
+    .breadcrumbs .items::-webkit-scrollbar-track {
+      background: var(--color-foreground-4);
+    }
+
+    .breadcrumbs .item {
+      align-items: center;
+      display: flex;
+      font-size: .875rem;
+      gap: .5rem;
+      padding: .5rem 0;
+    }
+
+    .breadcrumbs .item a {
+      display: block;
+      max-width: 14rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .breadcrumbs .item:first-child a {
+      display: block;
+      font-size: 0;
+      height: 1rem;
+      position: relative;
+      width: 1rem;
+    }
+
+    .breadcrumbs .item:first-child a::before {
+      content: '';
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 7px solid currentColor;
+      position: absolute;
+    }
+
+    .breadcrumbs .item:first-child a::after {
+      content: '';
+      border: solid currentColor;
+      position: absolute;
+      top: 7px;
+      left: 3px;
+      border-width: 3px 5px 4px 5px;
+    }
+
+    .breadcrumbs .item .icon-caret {
+      transform: rotate(-90deg);
+      flex-shrink: 0;
+    }
+
+    .breadcrumbs .item:last-child .icon-caret {
+      display: none;
+    }
+{% endstyle %}
+
+{%- if request.locale.iso_code contains 'ar' %}
+    {% style %}
+        .breadcrumbs .item .icon-caret {
+          transform: rotate(-270deg);
+        }
+    {% endstyle %}
+{% endif %}
+
+<div class="dynamic-page-width breadcrumbs" aria-label="breadcrumbs">
+    <ul class="items scrollbar">
+        <li class="item">
+            <a href="{{ shop.url }}" title="{{ 'general.breadcrumbs.home_page' | t }}"
+                ><strong>{{ 'general.breadcrumbs.home_link' | t }}</strong></a
+            >
+            <svg
+                aria-hidden="true"
+                focusable="false"
+                role="presentation"
+                class="icon icon-caret"
+                height="12"
+                width="12"
+            >
+                <use href="#icon-caret"></use>
+            </svg>
+        </li>
+        {%- assign t = template | split: '.' | first -%}
+        {%- case t -%}
+            {%- when 'page' -%}
+                <li class="item">
+                    {{ page.title }}
+                </li>
+
+            {%- when 'collection' and collection.handle -%}
+                <li class="item">
+                    {{ collection.title }}
+                </li>
+
+            {%- when 'product' -%}
+                {%- if collection.title -%}
+                    <li class="item">
+                        <strong>{{ collection.title | link_to: collection.url }}</strong>
+                        <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            role="presentation"
+                            class="icon icon-caret"
+                            height="12"
+                            width="12"
+                        >
+                            <use href="#icon-caret"></use>
+                        </svg>
+                    </li>
+                {%- endif -%}
+                <li class="item">
+                    {{ product.title }}
+                </li>
+
+            {%- when 'article' -%}
+                {%- if article.url -%}
+                    <li class="item">
+                        <strong>{{ blog.title | link_to: blog.url }}</strong>
+                        <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            role="presentation"
+                            class="icon icon-caret"
+                            height="12"
+                            width="12"
+                        >
+                            <use href="#icon-caret"></use>
+                        </svg>
+                    </li>
+                {%- endif -%}
+                <li class="item">
+                    {{ article.title }}
+                </li>
+
+            {%- else -%}
+                <li class="item requested_path">
+                    {{ page_title }}
+                </li>
+        {%- endcase -%}
+    </ul>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.breadcrumbs.name",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "border_top",
+      "label": "t:sections.all.settings.border_top.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "border_bottom",
+      "label": "t:sections.all.settings.border_bottom.label"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.breadcrumbs.presets.name"
+    }
+  ]
+}
+{% endschema %}

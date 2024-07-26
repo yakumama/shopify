@@ -1,0 +1,245 @@
+{%- assign newsletter = section.blocks | where: 'type', 'newsletter' | first -%}
+
+{{ 'section-footer.css' | asset_url | stylesheet_tag }}
+{% if newsletter.size > 0 -%}
+    {{ 'component-newsletter-footer.css' | asset_url | stylesheet_tag }}
+{%- endif %}
+
+<style>
+    :root {
+        --footer-background-light-color: {{ settings.colors_footer_background_light_gradient | default: settings.colors_footer_background_light }};
+        --footer-newsletter-background-color: {{ settings.colors_footer_newsletter_background_gradient | default: settings.colors_footer_newsletter_background }};
+        --footer--foreground-color-rgb: {{ settings.colors_footer_foreground.red }}, {{ settings.colors_footer_foreground.green }}, {{ settings.colors_footer_foreground.blue }};
+        --footer--text-color: rgba(var(--footer--foreground-color-rgb), .6);
+        --footer--heading-color: {{ settings.colors_footer_foreground }};
+    }
+    {%- if section.settings.use_design_elements -%}
+    .footer-content ._triangle {
+        display: block;
+        border-width: 150px;
+        border-style: solid;
+        border-bottom: {{ section.settings.element_bg_color }};
+        opacity: {{ section.settings.element_bg_opacity | divided_by: 10 }};
+        position: absolute;
+    }
+    {% endif%}
+</style>
+<div class="footer-content {% if newsletter.settings != nil %}with_newsletter{% endif %}">
+    {%- if section.settings.use_design_elements -%}
+        <span
+            class="_circle"
+            style="background: {{ section.settings.element_bg_color }};opacity: {{ section.settings.element_bg_opacity }};"
+        ></span>
+    {%- endif -%}
+    <div class="wrapper {% if section.settings.full_width %}full-width{% else %}dynamic-page-width{% endif %}">
+        <div class="address {% if section.settings.show_logo == false %}with_no_logo{% endif %}">
+            {% for block in section.blocks %}
+                {% case block.type %}
+                    {% when 'footer-contacts' %}
+                        {%- render 'footer__block-contacts', block: block -%}
+
+                    {% when 'menu' %}
+                        <div data-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+                            {% if block.settings.title %}
+                                <span class="h5">
+                                    {{ block.settings.title | escape }}
+                                </span>
+                            {% endif %}
+                            <ul>
+                                {% for link in linklists[block.settings.menu].links %}
+                                    <li>
+                                        <a href="{{ link.url }}">{{ link.title }}</a>
+                                    </li>
+                                {% else %}
+                                    {% for i in (1..3) %}
+                                        <li>
+                                            <a
+                                                href="#"
+                                                onclick="alert('{{ alert_text | strip_html | json | escape }}');return false;"
+                                            >
+                                                {{- 'sections.footer.menu' | t -}}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                {% endcase %}
+            {% endfor %}
+        </div>
+        {% for block in section.blocks %}
+            {% case block.type %}
+                {% when 'newsletter' %}
+                    <div class="footer-contacts__newsletter" {{ block.shopify_attributes }}>
+                        <div class="h5">
+                            {{ 'newsletter.heading' | t }}
+                        </div>
+                        <div>
+                            {%- render 'form-newsletter-subscribe',
+                                form_id: 'newsletter-form-footer-contacts',
+                                button_icon: 'caret'
+                            -%}
+                        </div>
+                        {{ block.settings.subtext }}
+                    </div>
+            {% endcase %}
+        {% endfor %}
+    </div>
+    {%- if section.settings.use_design_elements -%}
+        {% render 'theme-icons', name: 'deco-circles', css_class: '_deco_circles' %}
+    {%- endif -%}
+    {%- if section.settings.use_design_elements -%}
+        <div class="_triangle"></div>
+    {%- endif -%}
+</div>
+
+{% schema %}
+{
+    "name": "t:sections.footer.name",
+    "class": "footer-section",
+    "tag": "footer",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "full_width",
+            "default": false,
+            "label": "t:sections.footer.settings.full_width.label"
+        },
+        {
+            "type": "checkbox",
+            "id": "payment_enable",
+            "default": true,
+            "label": "t:sections.footer.settings.payment_enable.label"
+        },
+        {
+            "type": "range",
+            "id": "payment_icons_saturate",
+            "min": 0,
+            "max": 100,
+            "step": 5,
+            "default": 100,
+            "unit": "%",
+            "label": "t:sections.footer.settings.payment_icons_saturate.label"
+        },
+        {
+            "type": "checkbox",
+            "id": "show_logo",
+            "label": "t:sections.footer.settings.show_logo.label",
+            "default": true
+        },
+        {
+            "type": "image_picker",
+            "id": "image",
+            "label": "t:sections.footer.settings.image.label"
+        },
+        {
+            "type": "range",
+            "id": "logo_width",
+            "min": 50,
+            "max": 200,
+            "step": 10,
+            "default": 50,
+            "unit": "t:sections.footer.settings.logo_width.unit",
+            "label": "t:sections.footer.settings.logo_width.label"
+        },
+        {
+            "type": "header",
+            "content": "t:sections.footer.settings.header_1.content"
+        },
+        {
+            "type": "checkbox",
+            "id": "use_design_elements",
+            "label": "t:sections.footer.settings.use_design_elements.label",
+            "default": true
+        },
+        {
+            "type": "color",
+            "id": "element_bg_color",
+            "label": "t:sections.footer.settings.element_bg_color.label",
+            "default": "#E7EFF4"
+        },
+        {
+            "type": "range",
+            "id": "element_bg_opacity",
+            "label": "t:sections.footer.settings.element_bg_opacity.label",
+            "min": 0,
+            "max": 1,
+            "step": 0.1,
+            "default": 0.5
+        }
+    ],
+    "max_blocks": 4,
+    "blocks": [
+        {
+            "type": "menu",
+            "name": "t:sections.footer.blocks.link_list.name",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "t:sections.footer.blocks.link_list.settings.heading.label",
+                    "info": "t:sections.footer.blocks.link_list.settings.heading.info",
+                    "default": "Quick links"
+                },
+                {
+                    "type": "link_list",
+                    "id": "menu",
+                    "label": "t:sections.footer.blocks.link_list.settings.menu.label",
+                    "info": "t:sections.footer.blocks.link_list.settings.menu.info"
+                }
+            ]
+        },
+        {
+            "type": "footer-contacts",
+            "name": "t:sections.footer.blocks.contancts.name",
+            "limit": 1,
+            "settings": [
+                {
+                   "type": "richtext",
+                   "id": "address",
+                   "label": "t:sections.footer.blocks.contancts.settings.address",
+                   "default": "<p>Fifth Ave Street 31<br />New York<br />USA</p>"
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_email",
+                    "label": "t:sections.footer.blocks.contancts.settings.show_email",
+                    "default": true
+                },
+                {
+                    "type": "checkbox",
+                    "id": "show_phone",
+                    "label": "t:sections.footer.blocks.contancts.settings.show_phone",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "type": "newsletter",
+            "name": "t:sections.footer.blocks.newsletter.name",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "title",
+                    "default": "Newsletter",
+                    "label": "t:sections.footer.blocks.newsletter.settings.heading.label"
+                },
+                {
+                    "type": "richtext",
+                    "id": "subtext",
+                    "default": "<p>Your information is secure and safe with us.</p>",
+                    "label": "t:sections.footer.blocks.newsletter.settings.subtext.label"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "t:sections.footer.presets.name"
+        }
+    ],
+    "enabled_on": {
+        "groups": ["footer"]
+    }
+}
+{% endschema %}

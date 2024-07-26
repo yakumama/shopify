@@ -1,0 +1,270 @@
+<style>
+    {% comment -%}
+      Critical styles for most common elements in main content.
+      Almost every page has multiple product listing on it.
+    {%- endcomment %}
+
+    {%- comment -%}
+    No need of special styles for currency symbol
+    .price .currency-sign {
+      position: relative;
+      padding: .25rem;
+    }
+    {%- endcomment -%}
+
+    :root {
+      --color-tag-foreground: {{ settings.colors_blog_tag_foreground }};
+      --color-tag-background: {{ settings.colors_blog_tag_background }};
+      --product-card--border-radius: {{ settings.product_card_border_radius }}px;
+    }
+
+    .slider--mobile {
+      /* Fix to prevent horizontal scroll on page load. */
+      /* Almost every page has some kind of slider. */
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    .badge {
+      border-radius: 1rem;
+    }
+
+    .badge-onsale {
+      background: {{ settings.colors_badge_sale_background }};
+      color: {{ settings.colors_badge_sale_foreground }};
+    }
+
+    .badge-soldout {
+      background: {{ settings.colors_badge_soldout_background }};
+      color: {{ settings.colors_badge_soldout_foreground }};
+    }
+
+    .grid-item {
+      flex-shrink: 0;
+    }
+
+    .grid-item .item-image {
+      position: relative;
+      width: 100%;
+    }
+
+    .grid-item .item-vendor {
+      color: var(--color-foreground-40);
+      word-break: break-all;
+    }
+
+    .grid-item .item-title {
+      display: -webkit-box;
+      font-weight: 500;
+      line-height: 140%;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      word-break: break-word;
+    }
+
+    .item-actions-wrapper > button {
+      padding: .25rem .5rem;
+      max-width: 100%;
+    }
+
+    .item-actions-wrapper > button span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    [data-mode="grid"] .item-details-wrapper {
+      font-size: calc(1rem - 1px);
+      line-height: 1.25rem;
+    }
+
+    [data-mode="grid"] .grid-item .item-vendor {
+      margin: .5rem 0 -.5rem;
+    }
+
+    [data-mode="grid"] .grid-item .item-title {
+      font-weight: 600;
+      margin: .75rem 0;
+    }
+
+    [data-mode="grid"] .grid-item .item-price {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    [data-mode="grid"] .item-price .price {
+      font-size: calc(1em + 2px);
+    }
+
+    [data-mode="grid"] .item-price .label.visually-hidden + .price--final {
+      font-size: var(--mode-grid__item__price-final__font-size, 1.25rem);
+      font-weight: 600;
+    }
+
+    [data-mode="grid"] .item-actions-wrapper {
+      --grid-item--actions-wrapper__space: 5%;
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      padding: .25rem;
+      bottom: var(--grid-item--actions-wrapper__space);
+      right: var(--grid-item--actions-wrapper__space);
+    }
+
+    [data-mode="grid"] .item-actions-wrapper > button {
+      border-radius: 999px;
+      border-width: 1px;
+      height: 2.5rem;
+      width: 2.5rem;
+    }
+
+    [data-mode="grid"] .item-actions-wrapper > [name=add],
+    [data-mode="grid"] .item-actions-wrapper > [name=view] {
+      --color-button-background: var(--color-base-accent-1-inverse);
+      --color-button-text: var(--color-base-accent-1);
+    }
+
+    [data-mode="grid"] .item-price--with-label .label,
+    [data-mode="grid"] .item-actions-wrapper > button .text {
+      height: 0;
+      opacity: 0;
+      overflow: clip;
+      position: absolute;
+      width: 0;
+    }
+
+    [data-mode="grid"] squama-item:not([data-status="ready"]) .item-date ~ .item-author {
+      display: none;
+    }
+
+    .grid-item .spr-badge[data-rating="0.0"],
+    [data-mode="list"] .item-actions-wrapper .icon-cart {
+      display: none;
+    }
+
+    @media (hover: hover) {
+      squama-item {
+        overflow: hidden;
+      }
+    }
+
+    /* slider buttons */
+    .slider-buttons {
+      margin-top: 2rem;
+    }
+
+    .slider-buttons .slider__button {
+      min-width: auto;
+      border: 1px solid #E0E0E0;
+      border-radius: 50%;
+      margin: 0 0.5rem;
+      background: transparent;
+    }
+
+    .slider-buttons .slider__button > svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+    /* end slider buttons */
+</style>
+
+<style media="all and (min-width: 768px)">
+    [data-mode="list"] .grid-item .item-title {
+      -webkit-line-clamp: initial;
+    }
+</style>
+
+<style media="all and (min-width: 990px)">
+    .magazine .slider-buttons,
+    .classic .slider-buttons {
+      display: none;
+    }
+
+    [data-mode="grid"][data-columns="2"],
+    [data-mode="grid"][data-columns="3"],
+    [data-mode="grid"][data-columns="4"]{
+      --mode-grid__item__price-final__font-size: 1.5rem;
+    }
+
+    [data-mode="grid"] .grid-item .item-title {
+      -webkit-line-clamp: 2;
+    }
+
+    [data-mode="grid"] .grid-item .item-price {
+      min-height: auto;
+      width: 100%;
+    }
+
+    [data-mode="grid"] .item-price--with-label .label {
+      height: auto;
+      opacity: 1;
+      position: static;
+      width: auto;
+    }
+
+    [data-mode="grid"] .item-actions-wrapper > button .text {
+      font-size: calc(1rem - 2px);
+    }
+</style>
+
+<style media="(hover: hover)">
+    [data-mode="grid"] .item-actions-wrapper {
+      overflow: hidden;
+    }
+
+    [data-mode="grid"] .item-actions-wrapper > * {
+      transform: translateY(calc(100% + .5rem));
+      opacity: 0;
+    }
+</style>
+
+<!-- footer -->
+<style>
+    .footer-content > .wrapper {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column-reverse;
+      gap: 1.5rem;
+    }
+
+    .newsletter-form__field-wrapper,
+    .footer-contacts__address {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .footer-contacts__social {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -.375rem;
+    }
+
+    .footer-contacts__social a {
+      padding: .375rem;
+    }
+
+    .footer-contacts__social a svg {
+      fill: #7A8FA3;
+      height: 2rem;
+      width: 2rem;
+    }
+
+    @media screen and (min-width: 990px) {
+      .footer-content > .wrapper {
+        flex-direction: row;
+      }
+
+      .footer__payment {
+        position: absolute;
+        bottom: -1rem;
+      }
+    }
+</style>
+
+{%- liquid
+    if request.locale.iso_code contains 'ar'
+        render 'critical-css__content--rtl'
+    endif
+-%}

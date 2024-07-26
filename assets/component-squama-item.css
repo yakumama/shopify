@@ -1,0 +1,156 @@
+squama-item {
+    --item__tansition-duration: .4s;
+    border-radius: var(--product-card--border-radius);
+}
+
+squama-item .item-link:focus::before {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+squama-item .item-link:focus:not(:focus-visible)::before {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+@media (hover: hover) {
+    squama-item {
+        --item__box-shadow: none;
+        --item__hover__offset: 0;
+        transition-property: transform;
+        transition-duration: var(--item__tansition-duration);
+    }
+
+    squama-item:hover,
+    squama-item[data-focused] {
+        --item__box-shadow: 5px 2px 20px .625rem var(--color-foreground-20);
+        --item__hover__offset: -.25rem;
+        z-index: 20;
+        overflow: visible}
+
+    [data-mode="grid"] squama-item:hover,
+    [data-mode="grid"] squama-item[data-focused] {
+        transform: translateY(-.375rem);
+    }
+
+    [data-mode="grid"] squama-item::after {
+        content: '';
+        border-radius: 0 0 var(--product-card--border-radius) var(--product-card--border-radius);
+        display: block;
+        position: absolute;
+        bottom: 0;
+        height: 1rem;
+        width: 100%;
+        z-index: 10;
+        background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+        --tw-gradient-from: transparent var(--tw-gradient-from-position);
+        --tw-gradient-to: rgb(0 0 0 / 0) var(--tw-gradient-to-position);
+        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+        --tw-gradient-to: var(--color-background) var(--tw-gradient-to-position)}
+
+
+    [data-mode="grid"] squama-item:hover::after,
+    [data-mode="grid"] squama-item[data-focused]::after {
+        display: none;
+    }
+
+    squama-item a.item-link {
+        box-shadow: var(--item__box-shadow);
+        position: relative;
+        transition-property: box-shadow;
+        transition-duration: var(--item__tansition-duration);
+    }
+
+    squama-item .item-link::before {
+        background: var(--grid-item__background-color, var(--color-background));
+        border-radius: var(--product-card--border-radius);
+        bottom: var(--item__hover__offset);
+        content: '';
+        left: var(--item__hover__offset);
+        position: absolute;
+        right: var(--item__hover__offset);
+        top: var(--item__hover__offset);
+        z-index: 1;
+    }
+
+    squama-item .item-link > * {
+        position: relative;
+        z-index: 2;
+    }
+
+    [data-mode="grid"] squama-item select-color-variants,
+    [data-mode="grid"] squama-item[data-status="ready"] .item-price:not(.no-label) .price--compare {
+        display: block;
+        opacity: 0;
+        transform: translateY(50%);
+        transition-property: transform, opacity;
+    }
+
+    [data-mode="grid"] squama-item[data-focused] select-color-variants,
+    [data-mode="grid"] squama-item:hover select-color-variants,
+    [data-mode="grid"] squama-item[data-focused] .item-price:not(.no-label) .price--compare,
+    [data-mode="grid"] squama-item:hover .item-price:not(.no-label) .price--compare {
+        opacity: 1;
+        transform: translateY(0);
+        /* set duration in focus style to quickly hide all data in card */
+        /* and reduce  artifacts */
+        transition-duration: var(--item__tansition-duration);
+    }
+
+    [data-mode="grid"] squama-item[data-focused] .item-price:not(.no-label) .price--compare {
+        display: block;
+
+    }
+
+    .grid-item squama-item:hover .item-title,
+    .grid-item squama-item[data-focused] .item-title {
+        -webkit-line-clamp: initial;
+    }
+
+    [data-mode="grid"] .item-actions-wrapper {
+        bottom: 0;
+        transition-property: bottom;
+        transition-duration: var(--item__tansition-duration);
+    }
+
+    [data-mode="grid"] squama-item:hover .item-actions-wrapper,
+    [data-mode="grid"] squama-item[data-focused] .item-actions-wrapper {
+        bottom: var(--grid-item--actions-wrapper__space);
+    }
+
+    [data-mode="grid"] squama-item:hover .item-actions-wrapper > *,
+    [data-mode="grid"] squama-item[data-focused] .item-actions-wrapper > * {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    squama-item:hover .item-image__with-secondary img,
+    squama-item[data-focused] .item-image__with-secondary img {
+        opacity: 0;
+    }
+
+    squama-item:hover .item-image__with-secondary img + img,
+    squama-item[data-focused] .item-image__with-secondary img + img {
+        opacity: 1;
+    }
+
+    .slider--tablet squama-item:hover,
+    .slider--desktop squama-item:hover {
+        --item__box-shadow: 0 .25rem .5rem 1rem var(--color-foreground-4);
+        --item__hover__offset: -.5rem
+    }
+}
+
+@media (hover: hover) and (min-width: 768px) {
+    squama-item:hover {
+        --item__box-shadow: 11px 4px 40px 1.25rem var(--color-foreground-20);
+        --item__hover__offset: -.75rem;
+    }
+
+    [data-mode="grid"] squama-item:hover,
+    [data-mode="grid"] squama-item[data-focused] {
+        transform: translateY(-.5rem);
+    }
+}

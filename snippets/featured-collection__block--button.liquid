@@ -1,0 +1,18 @@
+{%- comment -%}
+    Render button for section "Featured collection"
+
+    Accepts:
+     - block:      {Object}
+{%- endcomment -%}
+
+<a
+    href="{{ block.settings.link }}"
+    class="{% case block.settings.appearance %}{% when 'button' %}button button--primary animate-arrow{% when 'button_secondary' %}button animate-arrow{% when 'link' %}link{% endcase %} view-all"
+    title="{{ block.settings.label }}"
+    {{ block.shopify_attributes }}
+>
+    <span>{{ block.settings.label }}</span>
+    {% unless block.settings.appearance == 'link' -%}
+        {% render 'icons-solid', name: 'arrow-right', css_class: 'icon-arrow' %}
+    {% endunless %}
+</a>

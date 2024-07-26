@@ -1,0 +1,15 @@
+<div class="footer-contacts__image" style="max-width: {{ section.settings.logo_width }}px">
+    {% if section.settings.image %}
+        <div
+            class="media"
+            style="padding-bottom: {% render 'helper__media-padding-bottom' image: section.settings.image image_ratio: 'native' %};"
+        >
+            {% assign imgWidth = section.settings.logo_width | append: 'px' %}
+            {% assign imageWidth2x = section.settings.logo_width | times: 2 %}
+            {% assign widths = imgWidth | append: ',' | append: imageWidth2x | append: ',#iw#' %}
+            {% render 'render-image', image: section.settings.image, sizes: imgWidth, widths: widths %}
+        </div>
+    {% else %}
+        {%- render 'theme-icons', name: 'footer-logo', css_class: '' -%}
+    {% endif %}
+</div>

@@ -1,0 +1,52 @@
+{%- comment -%}
+    Render slider buttons with slider counter.
+
+    Accepts:
+     -  count {Number}
+{%- endcomment -%}
+{%- liquid
+    assign count = count | plus: 0
+-%}
+
+<div class="slider-buttons no-js-hidden" hidden>
+    <button
+        type="button"
+        class="slider__button slider-button--prev button--tertiary"
+        name="previous"
+        aria-label="{{ 'accessibility.previous_slide' | t }}"
+    >
+        <svg
+            class="icon"
+            aria-hidden="true"
+            focusable="false"
+            width="22"
+            height="18"
+        >
+            <use href="#icon-arrow-left"></use>
+        </svg>
+    </button>
+    <button
+        type="button"
+        class="slider__button slider-button--next button--tertiary"
+        name="next"
+        aria-label="{{ 'accessibility.next_slide' | t }}"
+    >
+        <svg
+            class="icon"
+            aria-hidden="true"
+            focusable="false"
+            width="22"
+            height="18"
+        >
+            <use href="#icon-arrow-right"></use>
+        </svg>
+    </button>
+    {% if count > 0 %}
+        <div class="slider-counter caption">
+            <span class="slider-counter--current">1</span>
+            <span aria-hidden="true"> - </span>
+            <span class="visually-hidden">{{ 'accessibility.of' | t }}</span>
+            <span class="slider-counter--total">{{ count }}</span>
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,77 @@
+{%- comment -%}
+    Render product quantity input using block settings
+
+    Accepts:
+     - block:      {Object}
+     - blockOrder: {Number}
+     - sectionId:  {String}
+     - product:    {Object}
+{%- endcomment -%}
+
+<div
+    class="product__info-block product__info-block--border product__info-block--quantity"
+    style="order: {{ blockOrder }}"
+    {{ block.shopify_attributes }}
+>
+    <div class="product-form__input product-form__quantity">
+        <label class="form__label" for="Quantity-{{ product.id }}" title="{{ 'products.product.quantity.label' | t }}">
+            {{ 'products.product.quantity.label' | t }}
+        </label>
+        <quantity-input class="quantity">
+            <button class="quantity__button button--small no-js-hidden" name="minus" type="button">
+                <span class="visually-hidden">
+                    {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
+                </span>
+                {% render 'icons-solid', name: 'minus' %}
+            </button>
+            <input
+                class="quantity__input"
+                type="number"
+                name="quantity"
+                id="Quantity-{{ product.id }}"
+                min="1"
+                value="1"
+                form="product-form-{{ sectionId }}"
+            >
+            <button class="quantity__button button--small no-js-hidden" name="plus" type="button">
+                <span class="visually-hidden">
+                    {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
+                </span>
+                {% render 'icons-solid', name: 'plus' %}
+            </button>
+        </quantity-input>
+
+        {% if block.settings.show_stock_status %}
+            <div
+                id="block-quantity-stock-info-{{ sectionId }}"
+                class="stock-info__wrapper"
+                data-updatable="true"
+            >
+                {% if product.selected_or_first_available_variant.available %}
+                    {% assign inventory_qty = product.selected_or_first_available_variant.inventory_quantity %}
+                    <div class="stock-status stock-status__in-stock">
+                        <svg viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 5L5.34 8.49988L11 1.5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>{{ 'products.product.stock.in' | t }}</span>
+                        {% comment %}
+                            If inventory_qty is 0 product is available then product inventory is not tracked.
+                        {% endcomment %}
+                        {% unless inventory_qty == 0 or inventory_qty > block.settings.stock_left_threshold %}
+                            <span class="inventory-qty" data-qty="{{ inventory_qty }}">
+                                {{ 'products.product.stock.inventory_left' | t: qty: inventory_qty }}
+                            </span>
+                        {% endunless %}
+                    </div>
+                {% else %}
+                    <div class="stock-status stock-status__out-of-stock">
+                        <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-close">
+                            <use href="#icon-close"></use>
+                        </svg>
+                        <span>{{ 'products.product.stock.out' | t }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
